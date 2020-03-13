@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Database\Models;
 
 use App\Database\AbstractModel;
 
-class User extends AbstractModel
+class Group extends AbstractModel
 {
 
     /**
@@ -12,17 +13,7 @@ class User extends AbstractModel
      *
      * @var array
      */
-    protected $fillable = [
-        'group_id',
-        'first_name',
-        'last_name',
-        'address',
-        'city',
-        'zip',
-        'country',
-        'email',
-        'phone'
-    ];
+    protected $fillable = ['name', 'description'];
 
     /**
      * The attributes that aren't mass assignable.
@@ -36,7 +27,5 @@ class User extends AbstractModel
      *
      * @var array
      */
-    protected $hidden = [
-        'password',
-    ];
+    protected $hidden = ['password'];
 }
