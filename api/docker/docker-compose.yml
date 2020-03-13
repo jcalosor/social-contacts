@@ -1,0 +1,51 @@
+version: '2'
+services:
+
+    # Backend Definition ------------------------------
+    laravel-spa-nginx:
+        build:
+            context: ./
+            dockerfile: laravel-spa.nginx.docker
+        volumes:
+            - ../:/var/www
+        ports:
+            - "8080:80"
+        environment:
+            - VIRTUAL_HOST=laravel-spa.local
+        links:
+            - laravel-spa-php
+        depends_on:
+            - laravel-spa-php
+    laravel-spa-php:
+        build:
+            context: ./
+            dockerfile: laravel-spa.php.docker
+        volumes:
+            - ../:/var/www
+        links:
+            - laravel-spa-database
+        environment:
+            - "DB_PORT=3306"
+            - "DB_HOST=laravel-spa-database"
+    laravel-spa-database:
+        image: mysql:5.7
+        environment:
+            - "MYSQL_ROOT_PASSWORD=YzwSFRwaSYFHr8pW"
+            - "MYSQL_DATABASE=laravel-spa"
+        ports:
+            - "33070:3306"
+    laravel-spa-mailhog:
+      image: mailhog/mailhog
+      ports:
+        - "8036:8036"
+    # Proxy Definition ------------------------------
+    laravel-spa-nginx-proxy:
+        image: jwilder/nginx-proxy
+        ports:
+            - "80:80"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+networks:
+    default:
+        external:
+            name: laravel-spa-nginx-proxy
