@@ -66,7 +66,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create a forbidden formatted api response.
+     * Return a forbidden formatted api response.
      *
      * @param null|mixed $content
      * @param null|mixed[] $headers
@@ -81,7 +81,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create a success formatted api response.
+     * Return a success formatted api response.
      *
      * @param mixed $content
      * @param null|mixed[] $headers
@@ -94,7 +94,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create an unauthorized formatted api response.
+     * Return an unauthorized formatted api response.
      *
      * @param null|mixed $content
      * @param null|mixed[] $headers

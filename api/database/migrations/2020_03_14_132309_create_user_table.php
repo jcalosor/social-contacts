@@ -14,7 +14,7 @@ class CreateUserTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');
     }
 
     /**
@@ -24,9 +24,9 @@ class CreateUserTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('user', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
-            $table->uuid('group_id');
+            $table->uuid('groups_id');
             $table->string('first_name', 32);
             $table->string('last_name', 32);
             $table->string('address', 190);
@@ -39,8 +39,8 @@ class CreateUserTable extends Migration
             $table->timestamp('updated_at')->useCurrent();
         });
 
-        Schema::table('user', function (Blueprint $table) {
-            $table->foreign('group_id')->references('id')->on('group')->onDelete('cascade');
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('groups_id')->references('id')->on('groups')->onDelete('cascade');
         });
     }
 }

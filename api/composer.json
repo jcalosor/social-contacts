@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.4",
+        "ext-json": "^7.4",
         "brick/math": "^0.8.14",
         "laravel/lumen-framework": "^7.0",
         "ramsey/uuid": "^3.9",

@@ -21,7 +21,7 @@ abstract class AbstractApiResponse extends Response implements ApiResponseInterf
     {
         parent::__construct();
 
-        $this->content = $content;
+        $this->content = \json_encode($content);
         $this->statusCode = $statusCode;
         $this->headers = new ResponseHeaderBag($headers ?? []);
     }

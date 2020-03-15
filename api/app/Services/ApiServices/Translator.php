@@ -13,16 +13,16 @@ class Translator implements TranslatorInterface
      *
      * @var \Illuminate\Contracts\Translation\Translator
      */
-    private $translator;
+    private \Illuminate\Contracts\Translation\Translator $translator;
 
     /**
      * Create new translation instance
      *
-     * @param \Illuminate\Contracts\Translation\Translator $contract Contracted translator instance
+     * @param \Illuminate\Contracts\Translation\Translator $translatorContract Contracted translator instance
      */
-    public function __construct(IlluminateTranslator $contract)
+    public function __construct(IlluminateTranslator $translatorContract)
     {
-        $this->translator = $contract;
+        $this->translator = $translatorContract;
     }
 
     /**
@@ -36,7 +36,7 @@ class Translator implements TranslatorInterface
      */
     public function get(string $key, ?array $replace = null, ?string $locale = null)
     {
-        return $this->translator->trans($key, $replace ?? [], $locale);
+        return $this->translator->get($key, $replace ?? [], $locale);
     }
 
     /**

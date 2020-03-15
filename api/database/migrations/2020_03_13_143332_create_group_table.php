@@ -14,7 +14,7 @@ class CreateGroupTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('group');
+        Schema::dropIfExists('groups');
     }
 
     /**
@@ -24,7 +24,7 @@ class CreateGroupTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('group', function (Blueprint $table) {
+        Schema::create('groups', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
             $table->string('name')->unique()->index('group_name');
             $table->string('description')->nullable();

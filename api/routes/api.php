@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
 |--------------------------------------------------------------------------
@@ -11,6 +12,13 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+/**
+ * @var \Laravel\Lumen\Routing\Router $router
+ */
+$router->group(['prefix' => 'v1'], function () use ($router): void {
+    // :GroupController
+    $router->group(['prefix' => 'group'], function () use ($router): void {
+        $router->get('/', 'GroupController@get');
+    });
 });
+

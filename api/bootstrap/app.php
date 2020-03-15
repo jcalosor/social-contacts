@@ -60,6 +60,7 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('unostent-repository');
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +96,9 @@ $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
+// Register in app providers
+$app->register(\App\Providers\ApiServicesServiceProvider::class);
+
 // Register vendor providers here
 $app->register(\Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class);
 
@@ -112,7 +116,7 @@ $app->register(\Unostentatious\Repository\Integration\Laravel\UnostentatiousRepo
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__ . '/../routes/web.php';
+    require __DIR__ . '/../routes/api.php';
 });
 
 return $app;
