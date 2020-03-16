@@ -6,8 +6,15 @@ namespace App\Utils\ApiConstructs;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-abstract class AbstractApiResponse extends Response implements ApiResponseInterface
+class AbstractApiResponse extends Response implements ApiResponseInterface
 {
+    /**
+     * The default content type to be returned.
+     *
+     * @var mixed[]
+     */
+    private array $jsonContentType = ['Content-Type' => 'application/json'];
+
     /**
      * AbstractApiResponse constructor.
      *
@@ -23,7 +30,7 @@ abstract class AbstractApiResponse extends Response implements ApiResponseInterf
 
         $this->content = \json_encode($content);
         $this->statusCode = $statusCode;
-        $this->headers = new ResponseHeaderBag($headers ?? []);
+        $this->headers = new ResponseHeaderBag(\array_merge($this->jsonContentType, $headers ?? []));
     }
 
     /**

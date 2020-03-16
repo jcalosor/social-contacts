@@ -7,6 +7,7 @@ use App\Database\Repositories\Interfaces\GroupRepositoryInterface;
 use App\Services\ApiServices\Interfaces\ApiRequestInterface;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
 use App\Services\ApiServices\Interfaces\TranslatorInterface;
+use App\Services\Validator\Interfaces\ValidatorInterface;
 use App\Utils\ApiConstructs\ApiResponseInterface;
 
 final class GroupController extends AbstractController
@@ -24,13 +25,15 @@ final class GroupController extends AbstractController
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory
      * @param \App\Database\Repositories\Interfaces\GroupRepositoryInterface $groupRepository
      * @param \App\Services\ApiServices\Interfaces\TranslatorInterface $translator
+     * @param \App\Services\Validator\Interfaces\ValidatorInterface $validator
      */
     public function __construct(
         ApiResponseFactoryInterface $apiResponseFactory,
         GroupRepositoryInterface $groupRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ValidatorInterface $validator
     ) {
-        parent::__construct($apiResponseFactory, $translator);
+        parent::__construct($apiResponseFactory, $translator, $validator);
 
         $this->groupRepository = $groupRepository;
     }
@@ -41,10 +44,14 @@ final class GroupController extends AbstractController
      * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @throws \App\Exceptions\Validation\RequestValidationException
      */
     public function create(ApiRequestInterface $request): ApiResponseInterface
     {
-        return $this->apiResponseFactory->create($request->toArray());
+        $data = $request->toArray();
+        $this->validateRequest($data);
+
+        return $this->apiResponseFactory->create($data);
     }
 
     /**
@@ -55,5 +62,16 @@ final class GroupController extends AbstractController
     public function get(): ApiResponseInterface
     {
         return $this->apiResponseFactory->createSuccess($this->groupRepository->all());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getValidationRules(): array
+    {
+        return [
+            'name' => 'string|required',
+            'description' => 'string|nullable'
+        ];
     }
 }

@@ -2,5 +2,5 @@
 declare(strict_types=1);
 
 return [
-    // Body not needed.
+    'validation_error' => 'Request validation failed with the following errors [:errors]'
 ];

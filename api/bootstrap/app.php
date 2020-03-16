@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -98,6 +99,7 @@ $app->register(App\Providers\EventServiceProvider::class);
 
 // Register in app providers
 $app->register(\App\Providers\ApiServicesServiceProvider::class);
+$app->register(\App\Providers\ValidatorServiceProvider::class);
 
 // Register vendor providers here
 $app->register(\Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class);

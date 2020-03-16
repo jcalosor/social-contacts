@@ -15,10 +15,13 @@ declare(strict_types=1);
 /**
  * @var \Laravel\Lumen\Routing\Router $router
  */
-$router->group(['prefix' => 'v1'], function () use ($router): void {
-    // :GroupController
-    $router->group(['prefix' => 'group'], function () use ($router): void {
-        $router->get('/', 'GroupController@get');
+$router->group(['prefix' => 'api'], function () use ($router): void {
+    $router->group(['prefix' => 'v1'], function () use ($router): void {
+        // :GroupController
+        $router->group(['prefix' => 'group'], function () use ($router): void {
+            $router->get('/', 'GroupController@get');
+            $router->post('/', 'GroupController@create');
+        });
     });
 });
 

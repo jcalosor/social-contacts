@@ -10,7 +10,9 @@
         "brick/math": "^0.8.14",
         "laravel/lumen-framework": "^7.0",
         "ramsey/uuid": "^3.9",
-        "unostentatious/repository": "^1.1"
+        "symfony/psr-http-message-bridge": "^2.0",
+        "unostentatious/repository": "^1.1",
+        "zendframework/zend-diactoros": "^2.2"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",

@@ -37,16 +37,6 @@ final class ApiServicesServiceProvider extends ServiceProvider
     }
 
     /**
-     * Create and return a resolved instance of ApiResponseFactory.
-     *
-     * @return \App\Services\ApiServices\ApiResponseFactory
-     */
-    private function __setApiResponseFactory(): ApiResponseFactory
-    {
-        return new ApiResponseFactory($this->app->get(TranslatorInterface::class));
-    }
-
-    /**
      * Create and return the instance with the HttpRequest's setTrustedProxies initiated.
      *
      * @return \App\Services\ApiServices\ApiRequest
@@ -61,5 +51,15 @@ final class ApiServicesServiceProvider extends ServiceProvider
         );
 
         return $this->app->make(ApiRequest::class);
+    }
+
+    /**
+     * Create and return a resolved instance of ApiResponseFactory.
+     *
+     * @return \App\Services\ApiServices\ApiResponseFactory
+     */
+    private function __setApiResponseFactory(): ApiResponseFactory
+    {
+        return new ApiResponseFactory($this->app->get(TranslatorInterface::class));
     }
 }
