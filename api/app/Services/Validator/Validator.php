@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingFieldTypeInspection
+ */
 declare(strict_types=1);
 
 namespace App\Services\Validator;
@@ -22,7 +25,7 @@ final class Validator implements ValidatorInterface
      *
      * @var \Illuminate\Validation\PresenceVerifierInterface|null
      */
-    private PresenceVerifierInterface $presence;
+    private $presence;
 
     /**
      * Validation instance

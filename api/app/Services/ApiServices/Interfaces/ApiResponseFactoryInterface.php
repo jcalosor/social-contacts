@@ -8,17 +8,6 @@ use App\Utils\ApiConstructs\ApiResponseInterface;
 interface ApiResponseFactoryInterface
 {
     /**
-     * Create a formatted api response for given parameters.
-     *
-     * @param mixed $content
-     * @param null|int $statusCode
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
-     */
-    public function create($content, ?int $statusCode = null, ?array $headers = null): ApiResponseInterface;
-
-    /**
      * Create an empty formatted api response.
      *
      * @param null|mixed[] $headers
@@ -48,14 +37,15 @@ interface ApiResponseFactoryInterface
     public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface;
 
     /**
-     * Create a success formatted api response.
+     * Return a success formatted api response.
      *
      * @param mixed $content
+     * @param null|int $code
      * @param null|mixed[] $headers
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createSuccess($content, ?array $headers = null): ApiResponseInterface;
+    public function createSuccess($content, ?int $code = null, ?array $headers = null): ApiResponseInterface;
 
     /**
      * Create an unauthorized formatted api response.
@@ -66,4 +56,14 @@ interface ApiResponseFactoryInterface
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
     public function createUnauthorized($content = null, ?array $headers = null): ApiResponseInterface;
+
+    /**
+     * Create a validation error formatted api response.
+     *
+     * @param null|mixed[] $errors
+     * @param null|mixed[] $headers
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    public function createValidationError(?array $errors = null, ?array $headers = null): ApiResponseInterface;
 }

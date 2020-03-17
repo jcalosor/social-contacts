@@ -27,20 +27,6 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create a formatted api response for given parameters.
-     *
-     * @param mixed $content
-     * @param null|int $statusCode
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
-     */
-    public function create($content, ?int $statusCode = null, ?array $headers = null): ApiResponseInterface
-    {
-        return new ApiResponse($content, $statusCode, $headers);
-    }
-
-    /**
      * Create an empty formatted api response.
      *
      * @param null|mixed[] $headers
@@ -62,7 +48,14 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
      */
     public function createError($content, ?array $headers = null): ApiResponseInterface
     {
-        return $this->create($content, 500, $headers);
+        $code = 500;
+
+        $content = $content ?? [
+                'message' => $this->translator->trans('responses.error'),
+                'code' => $code
+            ];
+
+        return $this->create($content, $code, $headers);
     }
 
     /**
@@ -75,22 +68,36 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
      */
     public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface
     {
-        $content = $content ?? ['message' => $this->translator->trans('responses.forbidden')];
+        $code = 403;
 
-        return $this->create($content, 403, $headers);
+        $content = $content ?? [
+                'message' => $this->translator->trans('responses.forbidden'),
+                'code' => $code
+            ];
+
+        return $this->create($content, $code, $headers);
     }
 
     /**
      * Return a success formatted api response.
      *
      * @param mixed $content
+     * @param null|int $code
      * @param null|mixed[] $headers
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createSuccess($content, ?array $headers = null): ApiResponseInterface
+    public function createSuccess($content, ?int $code = null, ?array $headers = null): ApiResponseInterface
     {
-        return $this->create($content, 201, $headers);
+        $code = $code ?? 201;
+
+        $content = [
+            'message' => $this->translator->trans('responses.success'),
+            'data' => $content,
+            'code' => $code
+        ];
+
+        return $this->create($content, $code, $headers);
     }
 
     /**
@@ -103,8 +110,43 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
      */
     public function createUnauthorized($content = null, ?array $headers = null): ApiResponseInterface
     {
-        $content = $content ?? ['message' => $this->translator->trans('responses.unauthorized')];
+        $code = 401;
 
-        return $this->create($content, 401, $headers);
+        $content = $content ?? [
+                'message' => $this->translator->trans('responses.unauthorized'),
+                'code' => $code
+            ];
+
+        return $this->create($content, $code, $headers);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createValidationError(?array $errors = null, ?array $headers = null): ApiResponseInterface
+    {
+        $code = 400;
+
+        $content = [
+            'message' => $this->translator->trans('responses.validation_error'),
+            'errors' => $errors,
+            'code' => $code
+        ];
+
+        return $this->create($content, $code, $headers);
+    }
+
+    /**
+     * Create a formatted api response for given parameters.
+     *
+     * @param mixed $content
+     * @param null|int $statusCode
+     * @param null|mixed[] $headers
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    private function create($content, ?int $statusCode = null, ?array $headers = null): ApiResponseInterface
+    {
+        return new ApiResponse($content, $statusCode, $headers);
     }
 }

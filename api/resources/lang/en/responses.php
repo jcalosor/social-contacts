@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 return [
-    'forbidden' => 'Forbidden',
-    'unauthorized' => 'Unauthorized'
+    'error' => 'Internal Error',
+    'forbidden' => 'Request Forbidden',
+    'success' => 'Success!',
+    'unauthorized' => 'Request Unauthorized',
+    'validation_error' => 'Request validation failed.'
 ];

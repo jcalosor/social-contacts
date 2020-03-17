@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Database\Models\Group;
 use App\Database\Repositories\Interfaces\GroupRepositoryInterface;
 use App\Services\ApiServices\Interfaces\ApiRequestInterface;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
@@ -44,14 +45,36 @@ final class GroupController extends AbstractController
      * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
-     * @throws \App\Exceptions\Validation\RequestValidationException
+     *
+     * @throws \Exception
      */
     public function create(ApiRequestInterface $request): ApiResponseInterface
     {
         $data = $request->toArray();
-        $this->validateRequest($data);
+        $validate = $this->validateRequest($data);
+        if ($validate !== true) {
+            return $this->apiResponseFactory->createValidationError($validate);
+        }
 
-        return $this->apiResponseFactory->create($data);
+        $group = new Group($data);
+
+        $this->groupRepository->save($group);
+
+        return $this->apiResponseFactory->createSuccess($group->toArray());
+    }
+
+    /**
+     * Return the found group from the specified groupId.
+     *
+     * @param string $groupId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    public function get(string $groupId): ApiResponseInterface
+    {
+        $group = $this->groupRepository->find($groupId);
+
+        return $this->apiResponseFactory->createSuccess($group->toArray());
     }
 
     /**
@@ -59,9 +82,32 @@ final class GroupController extends AbstractController
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function get(): ApiResponseInterface
+    public function list(): ApiResponseInterface
     {
         return $this->apiResponseFactory->createSuccess($this->groupRepository->all());
+    }
+
+    /**
+     * Update group based from the provided groupId.
+     *
+     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     * @param string $groupId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    public function update(ApiRequestInterface $request, string $groupId): ApiResponseInterface
+    {
+        $data = $request->toArray();
+        $validate = $this->validateRequest($data);
+        if ($validate !== true) {
+            return $this->apiResponseFactory->createValidationError($validate);
+        }
+        $group = $this->groupRepository->find($groupId);
+        $group->fill($data);
+
+        $this->groupRepository->save($group);
+
+        return $this->apiResponseFactory->createSuccess($group->toArray(), 200);
     }
 
     /**
@@ -70,7 +116,7 @@ final class GroupController extends AbstractController
     protected function getValidationRules(): array
     {
         return [
-            'name' => 'string|required',
+            'name' => 'string|required|unique:groups',
             'description' => 'string|nullable'
         ];
     }

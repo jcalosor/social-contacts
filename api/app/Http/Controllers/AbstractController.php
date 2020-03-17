@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\Validation\RequestValidationException;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
 use App\Services\ApiServices\Interfaces\TranslatorInterface;
 use App\Services\Validator\Interfaces\ValidatorInterface;
@@ -61,17 +60,12 @@ abstract class AbstractController extends BaseController
      *
      * @param mixed[] $request
      *
-     * @return bool
-     *
-     * @throws \App\Exceptions\Validation\RequestValidationException
+     * @return mixed
      */
-    protected function validateRequest(array $request): bool
+    protected function validateRequest(array $request)
     {
         if ($this->validator->validate($request, $this->getValidationRules()) === false) {
-            throw new RequestValidationException(
-                $this->translator->get('exceptions.validation_error'),
-                $this->validator->getFailures()
-            );
+            return $this->validator->getFailures();
         }
 
         return true;
