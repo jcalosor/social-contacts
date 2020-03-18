@@ -37,6 +37,17 @@ interface ApiResponseFactoryInterface
     public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface;
 
     /**
+     * Create a not found formatted api response.
+     *
+     * @param mixed $id
+     * @param string $model
+     * @param null|array $headers
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    public function createNotFound(string $id, string $model, ?array $headers = null): ApiResponseInterface;
+
+    /**
      * Return a success formatted api response.
      *
      * @param mixed $content

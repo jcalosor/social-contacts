@@ -27,11 +27,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create an empty formatted api response.
-     *
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @inheritDoc
      */
     public function createEmpty(?array $headers = null): ApiResponseInterface
     {
@@ -39,85 +35,61 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     }
 
     /**
-     * Create an error formatted api response.
-     *
-     * @param mixed $content
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @inheritDoc
      */
     public function createError($content, ?array $headers = null): ApiResponseInterface
     {
         $code = 500;
 
-        $content = $content ?? [
-                'message' => $this->translator->trans('responses.error'),
-                'code' => $code
-            ];
-
-        return $this->create($content, $code, $headers);
+        return $this->__create($this->composeContent(null, null, $code, null), $code, $headers);
     }
 
     /**
-     * Return a forbidden formatted api response.
-     *
-     * @param null|mixed $content
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @inheritDoc
      */
     public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface
     {
         $code = 403;
 
-        $content = $content ?? [
-                'message' => $this->translator->trans('responses.forbidden'),
-                'code' => $code
-            ];
-
-        return $this->create($content, $code, $headers);
+        return $this->__create($this->composeContent('responses.forbidden', null, $code, null), $code, $headers);
     }
 
     /**
-     * Return a success formatted api response.
-     *
-     * @param mixed $content
-     * @param null|int $code
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @inheritDoc
+     */
+    public function createNotFound(string $id, string $model, ?array $headers = null): ApiResponseInterface
+    {
+        $code = 200;
+
+        return $this->__create(
+            $this->composeContent('responses.not_found', null, $code, null, ['id' => $id, 'model' => $model]),
+            $code,
+            $headers
+        );
+    }
+
+    /**
+     * @inheritDoc
      */
     public function createSuccess($content, ?int $code = null, ?array $headers = null): ApiResponseInterface
     {
-        $code = $code ?? 201;
+        $code = $code ?? 200;
 
-        $content = [
-            'message' => $this->translator->trans('responses.success'),
-            'data' => $content,
-            'code' => $code
-        ];
-
-        return $this->create($content, $code, $headers);
+        return $this->__create($this->composeContent('responses.success', $content, $code, null), $code, $headers);
     }
 
     /**
-     * Return an unauthorized formatted api response.
-     *
-     * @param null|mixed $content
-     * @param null|mixed[] $headers
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @inheritDoc
      */
     public function createUnauthorized($content = null, ?array $headers = null): ApiResponseInterface
     {
         $code = 401;
 
-        $content = $content ?? [
-                'message' => $this->translator->trans('responses.unauthorized'),
-                'code' => $code
-            ];
-
-        return $this->create($content, $code, $headers);
+        return $this->__create(
+            $this->composeContent('responses.unauthorized', null, $code, null),
+            $code,
+            $headers
+        );
     }
 
     /**
@@ -127,13 +99,48 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     {
         $code = 400;
 
-        $content = [
-            'message' => $this->translator->trans('responses.validation_error'),
-            'errors' => $errors,
+        return $this->__create(
+            $this->composeContent('responses.validation_error', null, $code, $errors),
+            $code,
+            $headers
+        );
+    }
+
+    /**
+     * Returns a formatted response array.
+     *
+     * @param null|string $message
+     * @param null|array $data
+     * @param null|int $code
+     * @param null|array $errors
+     * @param null|array $replace
+     *
+     * @return mixed[]
+     */
+    protected function composeContent(
+        ?string $message = null,
+        ?array $data = null,
+        ?int $code = null,
+        ?array $errors = null,
+        ?array $replace = null
+    ): array {
+        $code = $code ?? 200;
+
+        if ($errors !== null) {
+            $errorMessage = $message ?? 'responses.error';
+
+            return [
+                'message' => $this->translator->trans($errorMessage),
+                'errors' => $errors,
+                'code' => $code
+            ];
+        }
+
+        return [
+            'message' => $replace ? $this->translator->trans($message, $replace) : $this->translator->trans($message),
+            'data' => $data,
             'code' => $code
         ];
-
-        return $this->create($content, $code, $headers);
     }
 
     /**
@@ -145,7 +152,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    private function create($content, ?int $statusCode = null, ?array $headers = null): ApiResponseInterface
+    private function __create($content, ?int $statusCode = null, ?array $headers = null): ApiResponseInterface
     {
         return new ApiResponse($content, $statusCode, $headers);
     }

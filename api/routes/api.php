@@ -24,6 +24,14 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
             $router->get('/{groupId}', 'GroupController@get');
             $router->put('/{groupId}', 'GroupController@update');
         });
+
+        // :UserController
+        $router->group(['prefix' => 'user'], function () use ($router): void {
+            $router->get('/', 'UserController@list');
+            $router->post('/', 'UserController@create');
+            $router->get('/{userId}', 'UserController@get');
+            $router->put('/{userId}', 'UserController@update');
+        });
     });
 });
 

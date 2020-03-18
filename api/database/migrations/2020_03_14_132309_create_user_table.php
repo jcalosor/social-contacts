@@ -26,9 +26,9 @@ class CreateUserTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
-            $table->uuid('groups_id');
             $table->string('first_name', 32);
             $table->string('last_name', 32);
+            $table->string('password', 190);
             $table->string('address', 190);
             $table->string('city', 190);
             $table->string('zip', 6);
@@ -37,10 +37,6 @@ class CreateUserTable extends Migration
             $table->string('phone', 13);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreign('groups_id')->references('id')->on('groups')->onDelete('cascade');
         });
     }
 }

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpMissingFieldTypeInspection this is due to laravel-lumen's implementation. */
 declare(strict_types=1);
 
 namespace App\Database\Models;

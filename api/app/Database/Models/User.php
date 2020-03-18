@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpMissingFieldTypeInspection this is due to laravel-lumen's implementation. */
+declare(strict_types=1);
 
 namespace App\Database\Models;
 
@@ -12,10 +14,11 @@ class User extends AbstractModel
      *
      * @var array
      */
+
     protected $fillable = [
-        'group_id',
         'first_name',
         'last_name',
+        'password',
         'address',
         'city',
         'zip',

@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Services\ApiServices\Interfaces\ApiRequestInterface;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
 use App\Services\ApiServices\Interfaces\TranslatorInterface;
 use App\Services\Validator\Interfaces\ValidatorInterface;
+use App\Utils\ApiConstructs\ApiResponseInterface;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
 abstract class AbstractController extends BaseController
@@ -56,15 +58,31 @@ abstract class AbstractController extends BaseController
     abstract protected function getValidationRules(): array;
 
     /**
+     * Validate request and return ApiResponseInterface if validation fails.
+     *
+     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     *
+     * @return null|\App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    protected function validateRequestAndRespond(ApiRequestInterface $request): ?ApiResponseInterface
+    {
+        if (true !== $validate = $this->__validateRequest($request->toArray())) {
+            return $this->apiResponseFactory->createValidationError($validate);
+        }
+
+        return null;
+    }
+
+    /**
      * Validate request against the define validation rules.
      *
-     * @param mixed[] $request
+     * @param mixed[] $data
      *
      * @return mixed
      */
-    protected function validateRequest(array $request)
+    private function __validateRequest(array $data)
     {
-        if ($this->validator->validate($request, $this->getValidationRules()) === false) {
+        if ($this->validator->validate($data, $this->getValidationRules()) === false) {
             return $this->validator->getFailures();
         }
 
