@@ -31,6 +31,11 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
             $router->post('/', 'UserController@create');
             $router->get('/{userId}', 'UserController@get');
             $router->put('/{userId}', 'UserController@update');
+
+            // :UserContactController
+            $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
+                $router->post('/', 'UserContactController@create');
+            });
         });
     });
 });
