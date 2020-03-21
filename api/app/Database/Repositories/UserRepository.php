@@ -5,9 +5,8 @@ namespace App\Database\Repositories;
 
 use App\Database\Models\User;
 use App\Database\Repositories\Interfaces\UserRepositoryInterface;
-use Unostentatious\Repository\AbstractEloquentRepository;
 
-final class UserRepository extends AbstractEloquentRepository implements UserRepositoryInterface
+final class UserRepository extends AbstractRepository implements UserRepositoryInterface
 {
 
     /**

@@ -47,7 +47,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     /**
      * @inheritDoc
      */
-    public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface
+    public function createForbidden(?array $headers = null): ApiResponseInterface
     {
         $code = 403;
 
@@ -57,7 +57,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     /**
      * @inheritDoc
      */
-    public function createNotFound(string $id, string $model, ?array $headers = null): ApiResponseInterface
+    public function createNotFound(string $model, ?string $id = null, ?array $headers = null): ApiResponseInterface
     {
         $code = 200;
 
@@ -71,11 +71,19 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
     /**
      * @inheritDoc
      */
-    public function createSuccess($content, ?int $code = null, ?array $headers = null): ApiResponseInterface
-    {
+    public function createSuccess(
+        $content,
+        ?int $code = null,
+        ?array $headers = null,
+        ?string $message = null
+    ): ApiResponseInterface {
         $code = $code ?? 200;
 
-        return $this->__create($this->composeContent('responses.success', $content, $code, null), $code, $headers);
+        return $this->__create(
+            $this->composeContent($message ?? 'responses.success', $content, $code, null),
+            $code,
+            $headers
+        );
     }
 
     /**

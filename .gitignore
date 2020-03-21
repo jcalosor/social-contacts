@@ -1,1 +1,7 @@
+.idea
 api/vendor
+api/Homestead.json
+api/Homestead.yaml
+api/.env
+api/.phpunit.result.cache
+api/.idea

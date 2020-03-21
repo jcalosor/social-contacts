@@ -5,9 +5,8 @@ namespace App\Database\Repositories;
 
 use App\Database\Models\Group;
 use App\Database\Repositories\Interfaces\GroupRepositoryInterface;
-use Unostentatious\Repository\AbstractEloquentRepository;
 
-final class GroupRepository extends AbstractEloquentRepository implements GroupRepositoryInterface
+final class GroupRepository extends AbstractRepository implements GroupRepositoryInterface
 {
 
     /**

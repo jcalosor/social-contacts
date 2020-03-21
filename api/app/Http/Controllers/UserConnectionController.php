@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Database\Models\UserContact;
-use App\Database\Repositories\Interfaces\GroupRepositoryInterface;
+use App\Database\Models\AbstractModel;
+use App\Database\Models\UserConnections;
+use App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface;
 use App\Database\Repositories\Interfaces\UserContactRepositoryInterface;
 use App\Database\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\ApiServices\Interfaces\ApiRequestInterface;
@@ -13,38 +14,36 @@ use App\Services\ApiServices\Interfaces\TranslatorInterface;
 use App\Services\Validator\Interfaces\ValidatorInterface;
 use App\Utils\ApiConstructs\ApiResponseInterface;
 
-final class UserContactController extends AbstractController
+final class UserConnectionController extends AbstractController
 {
-    /** @var \App\Database\Repositories\Interfaces\GroupRepositoryInterface $groupRepository */
-    private GroupRepositoryInterface $groupRepository;
 
-    /** @var \App\Database\Repositories\Interfaces\UserContactRepositoryInterface $userContactRepository */
+    private UserConnectionRepositoryInterface $userConnectionRepository;
+
     private UserContactRepositoryInterface $userContactRepository;
 
-    /** @var \App\Database\Repositories\Interfaces\UserRepositoryInterface $userRepository */
     private UserRepositoryInterface $userRepository;
 
     /**
-     * UserContactController constructor.
+     * UserConnectionController constructor.
      *
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory
-     * @param \App\Database\Repositories\Interfaces\GroupRepositoryInterface $groupRepository
      * @param \App\Services\ApiServices\Interfaces\TranslatorInterface $translator
+     * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userConnectionRepository
      * @param \App\Database\Repositories\Interfaces\UserContactRepositoryInterface $userContactRepository
      * @param \App\Database\Repositories\Interfaces\UserRepositoryInterface $userRepository
      * @param \App\Services\Validator\Interfaces\ValidatorInterface $validator
      */
     public function __construct(
         ApiResponseFactoryInterface $apiResponseFactory,
-        GroupRepositoryInterface $groupRepository,
         TranslatorInterface $translator,
+        UserConnectionRepositoryInterface $userConnectionRepository,
         UserContactRepositoryInterface $userContactRepository,
         UserRepositoryInterface $userRepository,
         ValidatorInterface $validator
     ) {
         parent::__construct($apiResponseFactory, $translator, $validator);
 
-        $this->groupRepository = $groupRepository;
+        $this->userConnectionRepository = $userConnectionRepository;
         $this->userContactRepository = $userContactRepository;
         $this->userRepository = $userRepository;
     }
@@ -61,83 +60,124 @@ final class UserContactController extends AbstractController
      */
     public function create(ApiRequestInterface $request, string $userId): ApiResponseInterface
     {
-        $request->merge(['users_id' => $userId]);
+        $request->merge(['inviter_id' => $userId, 'status' => AbstractModel::PENDING_STATUS]);
 
         if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {
             return $errorResponse;
         }
 
-        /** @var \App\Database\Models\Group $group */
-        $group = $this->groupRepository->find($request->input('groups_id'));
+        // We'll have to validate that the requested connection is not yet existing.
+        /** @var null|\App\Database\Models\UserConnections $userConnection */
+        $userConnection = $this->userConnectionRepository->findOneBy($request->only([
+            'inviter_id',
+            'invitee_id'
+        ]));
 
-        /** @var \App\Database\Models\User $contact */
-        $contact = $this->userRepository->find($request->input('contacts_id'));
+        if ($userConnection !== null) {
+            if ($userConnection->status === $request->input('status') || $userConnection->status === AbstractModel::ACCEPTED_STATUS) {
+                return $this->apiResponseFactory->createValidationError(['user_connection' => 'Connection request already exists.']);
+            }
 
-        /** @var \App\Database\Models\UserContact $userContact */
-        $userContact = (new UserContact(['users_id' => $userId]))
-            ->setContact($contact)
-            ->setGroup($group);
+            // If the `status` is different from pending or accepted, this means the user is trying to reconnect.
+            if ($userConnection->status === AbstractModel::DECLINED_STATUS) {
+                // We'll have to update that user connection to pending status again.
+                $userConnection->fill(['status' => AbstractModel::PENDING_STATUS]);
+                $this->userConnectionRepository->save($userConnection);
 
-        $this->userContactRepository->save($userContact);
+                return $this->apiResponseFactory->createSuccess(
+                    $userConnection->toArray(),
+                    200,
+                    null,
+                    'responses.success_connection_request'
+                );
+            }
+        }
 
-        return $this->apiResponseFactory->createSuccess($userContact->toArray(), 201);
+        /** @var \App\Database\Models\User $invitee */
+        $invitee = $this->userRepository->find($request->input('invitee_id'));
+
+        /** @var \App\Database\Models\User $inviter */
+        $inviter = $this->userRepository->find($request->input('inviter_id'));
+
+        $userConnection = (new UserConnections($request->only(['status'])))
+            ->setInvitee($invitee)
+            ->setInviter($inviter);
+
+        $this->userConnectionRepository->save($userConnection);
+
+        // @todo: Call an event here that will publish the creation of the user connection.
+        // with this, the corresponding user contact will be created
+        return $this->apiResponseFactory->createSuccess($userConnection->toArray(), 201);
     }
 
     /**
-     * Delete's a user's contact.
+     * Delete's a user's connection.
      *
      * @param string $userId
-     * @param string $contactId
+     * @param string $connectionId
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      * @throws \Exception
      */
-    public function delete(string $userId, string $contactId): ApiResponseInterface
+    public function delete(string $userId, string $connectionId): ApiResponseInterface
     {
-        /** @var null|\App\Database\Models\UserContact $userContact */
-        $userContact = $this->userContactRepository->findOneBy(['users_id' => $userId, 'contacts_id' => $contactId]);
+        /** @var null|\App\Database\Models\UserConnections $userConnection */
+        $userConnection = $this->userConnectionRepository->find($connectionId);
 
-        if ($userContact === null) {
-            return $this->apiResponseFactory->createNotFound(UserContact::class, $contactId);
+        if ($userConnection === null) {
+            return $this->apiResponseFactory->createNotFound(UserConnections::class, $connectionId);
         }
 
-        $this->userContactRepository->delete($userContact);
+        if ($userConnection->status === UserConnections::PENDING_STATUS && $userConnection->getInvitee()->getKey() === $userId) {
+            return $this->apiResponseFactory->createForbidden();
+        }
+
+        $this->userConnectionRepository->delete($userConnection);
 
         return $this->apiResponseFactory->createEmpty();
     }
 
     /**
-     * Update the user contact's group.
+     * Update the user connections status.
      *
      * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
      * @param string $userId
-     * @param string $contactId
+     * @param string $connectionId
+     * @param string $status
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      *
      * @throws \Exception
      */
-    public function update(ApiRequestInterface $request, string $userId, string $contactId): ApiResponseInterface
-    {
-        // We'll have to replace the existing validation rules.
-        $rules = [
-            'contacts_id' => 'nullable',
-            'groups_id' => 'string|required|exists:groups,id',
-            'users_id' => 'nullable'
-        ];
-
-        if (null !== $errorResponse = $this->validateRequestAndRespond($request, $rules)) {
+    public function update(
+        ApiRequestInterface $request,
+        string $userId,
+        string $connectionId,
+        string $status
+    ): ApiResponseInterface {
+        if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {
             return $errorResponse;
         }
 
-        /** @var null|\App\Database\Models\UserContact $userContact */
-        $userContact = $this->userContactRepository->findOneBy(['contacts_id' => $contactId, 'users_id' => $userId]);
+        /** @var null|\App\Database\Models\UserConnections $userConnections */
+        $userConnections = $this->userConnectionRepository->find($connectionId);
 
-        if ($userContact === null) {
-            return $this->apiResponseFactory->createNotFound(UserContact::class, $contactId);
+        if ($userConnections === null) {
+            return $this->apiResponseFactory->createNotFound(UserConnections::class, $connectionId);
         }
 
-        $this->apiResponseFactory->createSuccess($userContact->toArray());
+        if (
+            \array_key_exists($status, UserConnections::$statusMapper) === false ||
+            null === $connectionStatus = $this->__resolveConnectionStatus($userConnections, $userId, $status)
+        ) {
+            return $this->apiResponseFactory->createValidationError(['invalid_status' => 'Invalid status provided.']);
+        }
+
+        $userConnections->fill(['status' => $connectionStatus]);
+
+        $this->userConnectionRepository->save($userConnections);
+
+        return $this->apiResponseFactory->createSuccess($userConnections->toArray());
     }
 
     /**
@@ -146,11 +186,33 @@ final class UserContactController extends AbstractController
     protected function getValidationRules(): array
     {
         return [
-            'contacts_id' => 'string|required|exists:users,id|' .
-                $this->getUniqueRuleAsString('user_contacts', 'contacts_id', null, 'users_id'),
-            'groups_id' => 'string|required_with:users_id|exists:groups,id',
-            'users_id' => 'string|required_with:groups_id|exists:users,id|' .
-                $this->getUniqueRuleAsString('user_contacts', 'contacts_id', null, 'users_id')
+            'invitee_id' => 'string|required|exists:users,id',
+            'inviter_id' => 'string|required|exists:users,id'
         ];
+    }
+
+    /**
+     * Resolve the status mappings per user role.
+     *
+     * @param \App\Database\Models\UserConnections $userConnections
+     * @param string $userId
+     * @param string $status
+     *
+     * @return null|string
+     */
+    private function __resolveConnectionStatus(
+        UserConnections $userConnections,
+        string $userId,
+        string $status
+    ): ?string {
+        if ($userConnections->getInvitee()->getKey() === $userId) {
+            return UserConnections::$inviteeStatuses[$status] ?? null;
+        }
+
+        if ($userConnections->getInviter()->getKey() === $userId) {
+            return UserConnections::$inviterStatuses[$status] ?? null;
+        }
+
+        return null;
     }
 }

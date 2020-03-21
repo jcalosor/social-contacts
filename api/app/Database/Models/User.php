@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Database\Models;
 
-use App\Database\AbstractModel;
 use Illuminate\Database\Eloquent\Collection;
 
 class User extends AbstractModel

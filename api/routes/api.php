@@ -32,9 +32,11 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
             $router->get('/{userId}', 'UserController@get');
             $router->put('/{userId}', 'UserController@update');
 
-            // :UserContactController
-            $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
-                $router->post('/', 'UserContactController@create');
+            // :UserConnectionController
+            $router->group(['prefix' => '{userId}/connection'], function () use ($router): void {
+                $router->post('/', 'UserConnectionController@create');
+                $router->delete('/{connectionId}', 'UserConnectionController@delete');
+                $router->put('/{connectionId}/{status}', 'UserConnectionController@update');
             });
         });
     });

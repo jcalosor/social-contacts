@@ -62,6 +62,28 @@ final class GroupController extends AbstractController
     }
 
     /**
+     * Delete a group by it's group id.
+     *
+     * @param string $groupId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @throws \Exception
+     */
+    public function delete(string $groupId): ApiResponseInterface
+    {
+        /** @var null|\App\Database\Models\Group $group */
+        $group = $this->groupRepository->find($groupId);
+
+        if ($group === null) {
+            return $this->apiResponseFactory->createNotFound(Group::class, $groupId);
+        }
+
+        $this->groupRepository->delete($group);
+
+        return $this->apiResponseFactory->createEmpty();
+    }
+
+    /**
      * Return the found group from the specified groupId.
      *
      * @param string $groupId
@@ -73,7 +95,7 @@ final class GroupController extends AbstractController
         $group = $this->groupRepository->find($groupId);
 
         if ($group === null) {
-            return $this->apiResponseFactory->createNotFound($groupId, Group::class);
+            return $this->apiResponseFactory->createNotFound(Group::class, $groupId);
         }
 
         return $this->apiResponseFactory->createSuccess($group->toArray());

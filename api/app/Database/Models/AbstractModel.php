@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Database;
+namespace App\Database\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +9,69 @@ use Illuminate\Support\Str;
 
 abstract class AbstractModel extends Model
 {
+    /**
+     * The accepted status.
+     *
+     * @const string
+     */
+    public const ACCEPTED_STATUS = 'accepted';
+
+    /**
+     * The active status.
+     *
+     * @const string
+     */
+    public const ACTIVE_STATUS = 'active';
+
+    /**
+     * The confirmed status.
+     *
+     * @const string
+     */
+    public const CANCELED = 'canceled';
+
+    /**
+     * The confirmed status.
+     *
+     * @const string
+     */
+    public const CONFIRMED_STATUS = 'confirmed';
+
+    /**
+     * The declined status.
+     *
+     * @const string
+     */
+    public const DECLINED_STATUS = 'declined';
+
+    /**
+     * The deleted status.
+     *
+     * @const string
+     */
+    public const DELETED_STATUS = 'deleted';
+
+    /**
+     * The pending status.
+     *
+     * @const string
+     */
+    public const PENDING_STATUS = 'pending';
+
+    /**
+     * List of all the system wide statuses.
+     *
+     * @const string[]
+     */
+    protected const STATUSES = [
+        self::ACCEPTED_STATUS,
+        self::ACTIVE_STATUS,
+        self::CONFIRMED_STATUS,
+        self::DECLINED_STATUS,
+        self::DELETED_STATUS,
+        self::PENDING_STATUS
+    ];
+
     /**
      * The "booting" method of the model, generate and set the uuid.
      *
@@ -20,6 +83,18 @@ abstract class AbstractModel extends Model
         self::creating(function ($model) {
             $model->id = Str::uuid()->toString();
         });
+    }
+
+    /**
+     * Verifies if the given status is an existing status.
+     *
+     * @param string $status
+     *
+     * @return bool
+     */
+    public function checkStatus(string $status): bool
+    {
+        return \array_key_exists($status, self::STATUSES);
     }
 
     /**

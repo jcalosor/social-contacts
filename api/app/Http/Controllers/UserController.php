@@ -77,7 +77,7 @@ final class UserController extends AbstractController
         $user = $this->userRepository->find($userId);
 
         if ($user === null) {
-            return $this->apiResponseFactory->createNotFound($userId, User::class);
+            return $this->apiResponseFactory->createNotFound(User::class, $userId);
         }
 
         return $this->apiResponseFactory->createSuccess($user->toArray());

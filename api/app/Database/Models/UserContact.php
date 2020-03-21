@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Database\Models;
 
-use App\Database\AbstractModel;
-
 final class UserContact extends AbstractModel
 {
     /**
@@ -14,8 +12,9 @@ final class UserContact extends AbstractModel
      * @var array
      */
     protected $fillable = [
+        'contacts_id',
+        'user_connections_id',
         'users_id',
-        'contacts_id'
     ];
 
     /**
@@ -26,30 +25,29 @@ final class UserContact extends AbstractModel
     protected $guarded = ['id'];
 
     /**
-     * Get the user where this contact's belongs to.
+     * Get the user where this invitee belongs to.
      *
      * @return \App\Database\Models\User
      */
-    public function getUser(): User
+    public function getInvitee(): User
     {
         /** @var \App\Database\Models\User $user */
-        $user = $this->belongsTo(User::class, 'id', 'users_id')->first();
+        $user = $this->belongsTo(User::class, 'invitee_id', 'id')->first();
 
         return $user;
     }
 
     /**
-     * Associate the group this contact's belongs to.
+     * Get the user where this invitee belongs to.
      *
-     * @param \App\Database\Models\Group $group
-     *
-     * @return self
+     * @return \App\Database\Models\User
      */
-    public function setGroup(Group $group): self
+    public function getInviter(): User
     {
-        $this->belongsTo(Group::class, 'groups_id', 'id', 'group')->associate($group);
+        /** @var \App\Database\Models\User $user */
+        $user = $this->belongsTo(User::class, 'inviter_id', 'id')->first();
 
-        return $this;
+        return $user;
     }
 
     /**

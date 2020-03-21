@@ -58,15 +58,39 @@ abstract class AbstractController extends BaseController
     abstract protected function getValidationRules(): array;
 
     /**
+     * Get the unique rule for validation.
+     *
+     * @param string $tableName
+     * @param string $column
+     * @param null|int $except
+     * @param null|string $idColumn
+     *
+     * @return string
+     */
+    protected function getUniqueRuleAsString(
+        string $tableName,
+        string $column,
+        ?int $except = null,
+        ?string $idColumn = null
+    ): string {
+        $idColumn = $idColumn ?? 'id';
+
+        return \sprintf('unique:%s,%s,%s,%s', $tableName, $column, $except, $idColumn);
+    }
+
+    /**
      * Validate request and return ApiResponseInterface if validation fails.
      *
      * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     * @param null|mixed[] $additionalRules
      *
      * @return null|\App\Utils\ApiConstructs\ApiResponseInterface
      */
-    protected function validateRequestAndRespond(ApiRequestInterface $request): ?ApiResponseInterface
-    {
-        if (true !== $validate = $this->__validateRequest($request->toArray())) {
+    protected function validateRequestAndRespond(
+        ApiRequestInterface $request,
+        ?array $additionalRules = null
+    ): ?ApiResponseInterface {
+        if (true !== $validate = $this->__validateRequest($request->toArray(), $additionalRules)) {
             return $this->apiResponseFactory->createValidationError($validate);
         }
 
@@ -77,12 +101,18 @@ abstract class AbstractController extends BaseController
      * Validate request against the define validation rules.
      *
      * @param mixed[] $data
+     * @param null|mixed[] $additionalRules
      *
      * @return mixed
      */
-    private function __validateRequest(array $data)
+    private function __validateRequest(array $data, ?array $additionalRules = null)
     {
-        if ($this->validator->validate($data, $this->getValidationRules()) === false) {
+        $rules = $this->getValidationRules();
+        if ($additionalRules !== null) {
+            $rules = \array_merge($this->getValidationRules(), $additionalRules);
+        }
+
+        if ($this->validator->validate($data, $rules) === false) {
             return $this->validator->getFailures();
         }
 

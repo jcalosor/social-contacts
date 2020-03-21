@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace App\Database\Repositories\Interfaces;
 
-use Unostentatious\Repository\Interfaces\ModelRepositoryInterface;
-
-interface UserRepositoryInterface extends ModelRepositoryInterface
+interface UserRepositoryInterface extends AbstractRepositoryInterface
 {
     // Body not needed
 }

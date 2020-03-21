@@ -29,23 +29,22 @@ interface ApiResponseFactoryInterface
     /**
      * Create a forbidden formatted api response.
      *
-     * @param null|mixed $content
      * @param null|mixed[] $headers
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createForbidden($content = null, ?array $headers = null): ApiResponseInterface;
+    public function createForbidden(?array $headers = null): ApiResponseInterface;
 
     /**
      * Create a not found formatted api response.
      *
-     * @param mixed $id
      * @param string $model
+     * @param null|string $id
      * @param null|array $headers
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createNotFound(string $id, string $model, ?array $headers = null): ApiResponseInterface;
+    public function createNotFound(string $model, ?string $id = null, ?array $headers = null): ApiResponseInterface;
 
     /**
      * Return a success formatted api response.
@@ -53,10 +52,16 @@ interface ApiResponseFactoryInterface
      * @param mixed $content
      * @param null|int $code
      * @param null|mixed[] $headers
+     * @param null|string $message
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createSuccess($content, ?int $code = null, ?array $headers = null): ApiResponseInterface;
+    public function createSuccess(
+        $content,
+        ?int $code = null,
+        ?array $headers = null,
+        ?string $message = null
+    ): ApiResponseInterface;
 
     /**
      * Create an unauthorized formatted api response.
