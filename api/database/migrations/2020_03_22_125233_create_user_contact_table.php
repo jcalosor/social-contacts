@@ -27,17 +27,20 @@ class CreateUserContactTable extends Migration
         Schema::create('user_contacts', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
             $table->uuid('contacts_id');
-            $table->uuid('groups_id');
             $table->uuid('users_id')->index('user_contacts_id');
+            $table->uuid('user_connections_id');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
 
         Schema::table('user_contacts', function (Blueprint $table) {
-            $table->foreign('contacts_id')->references('id')->on('users')->onUpdate('cascade');
-            $table->foreign('groups_id')->references('id')->on('groups')->onUpdate('cascade');
-            $table->foreign('users_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-
+            $table->foreign('contacts_id')->references('id')->on('users');
+            $table->foreign('users_id')->references('id')->on('users');
+            $table->foreign('user_connections_id')
+                ->references('id')
+                ->on('user_connections')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
         });
     }
 }

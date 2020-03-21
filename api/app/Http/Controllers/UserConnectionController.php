@@ -90,11 +90,54 @@ final class UserContactController extends AbstractController
      * @param string $contactId
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     * @throws \Exception
      */
     public function delete(string $userId, string $contactId): ApiResponseInterface
     {
-        // Body needed here
-        return $this->apiResponseFactory->createSuccess([]);
+        /** @var null|\App\Database\Models\UserContact $userContact */
+        $userContact = $this->userContactRepository->findOneBy(['users_id' => $userId, 'contacts_id' => $contactId]);
+
+        if ($userContact === null) {
+            return $this->apiResponseFactory->createNotFound(UserContact::class, $contactId);
+        }
+
+        $this->userContactRepository->delete($userContact);
+
+        return $this->apiResponseFactory->createEmpty();
+    }
+
+    /**
+     * Update the user contact's group.
+     *
+     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     * @param string $userId
+     * @param string $contactId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     *
+     * @throws \Exception
+     */
+    public function update(ApiRequestInterface $request, string $userId, string $contactId): ApiResponseInterface
+    {
+        // We'll have to replace the existing validation rules.
+        $rules = [
+            'contacts_id' => 'nullable',
+            'groups_id' => 'string|required|exists:groups,id',
+            'users_id' => 'nullable'
+        ];
+
+        if (null !== $errorResponse = $this->validateRequestAndRespond($request, $rules)) {
+            return $errorResponse;
+        }
+
+        /** @var null|\App\Database\Models\UserContact $userContact */
+        $userContact = $this->userContactRepository->findOneBy(['contacts_id' => $contactId, 'users_id' => $userId]);
+
+        if ($userContact === null) {
+            return $this->apiResponseFactory->createNotFound(UserContact::class, $contactId);
+        }
+
+        $this->apiResponseFactory->createSuccess($userContact->toArray());
     }
 
     /**
@@ -103,9 +146,11 @@ final class UserContactController extends AbstractController
     protected function getValidationRules(): array
     {
         return [
-            'contacts_id' => 'string|required|exists:users,id',
+            'contacts_id' => 'string|required|exists:users,id|' .
+                $this->getUniqueRuleAsString('user_contacts', 'contacts_id', null, 'users_id'),
             'groups_id' => 'string|required_with:users_id|exists:groups,id',
-            'users_id' => 'string|required_with:groups_id|exists:users,id'
+            'users_id' => 'string|required_with:groups_id|exists:users,id|' .
+                $this->getUniqueRuleAsString('user_contacts', 'contacts_id', null, 'users_id')
         ];
     }
 }
