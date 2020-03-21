@@ -1,7 +1,10 @@
-<?php
+<?php /** @noinspection PhpMissingFieldTypeInspection */
+declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\UserContactsEvent;
+use App\Listeners\CreateUserContactsListener;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -12,8 +15,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        \App\Events\ExampleEvent::class => [
-            \App\Listeners\ExampleListener::class,
-        ],
+        UserContactsEvent::class => [CreateUserContactsListener::class]
     ];
 }

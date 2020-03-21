@@ -8,25 +8,50 @@ use App\Database\Models\UserConnections;
 use App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface;
 use App\Database\Repositories\Interfaces\UserContactRepositoryInterface;
 use App\Database\Repositories\Interfaces\UserRepositoryInterface;
+use App\Events\UserContactsEvent;
 use App\Services\ApiServices\Interfaces\ApiRequestInterface;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
 use App\Services\ApiServices\Interfaces\TranslatorInterface;
 use App\Services\Validator\Interfaces\ValidatorInterface;
 use App\Utils\ApiConstructs\ApiResponseInterface;
+use Illuminate\Contracts\Events\Dispatcher;
 
-final class UserConnectionController extends AbstractController
+final class UserConnectionController extends AbstractDispatchController
 {
 
+    /**
+     * Parameters for event.
+     *
+     * @var mixed[]
+     */
+    private array $eventParameters;
+
+    /**
+     * Instance of the user connection repository interface.
+     *
+     * @var \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface
+     */
     private UserConnectionRepositoryInterface $userConnectionRepository;
 
+    /**
+     * Instance of the user contact repository interface.
+     *
+     * @var \App\Database\Repositories\Interfaces\UserContactRepositoryInterface
+     */
     private UserContactRepositoryInterface $userContactRepository;
 
+    /**
+     * Instance of the user repository interface.
+     *
+     * @var \App\Database\Repositories\Interfaces\UserRepositoryInterface
+     */
     private UserRepositoryInterface $userRepository;
 
     /**
      * UserConnectionController constructor.
      *
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory
+     * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @param \App\Services\ApiServices\Interfaces\TranslatorInterface $translator
      * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userConnectionRepository
      * @param \App\Database\Repositories\Interfaces\UserContactRepositoryInterface $userContactRepository
@@ -35,13 +60,14 @@ final class UserConnectionController extends AbstractController
      */
     public function __construct(
         ApiResponseFactoryInterface $apiResponseFactory,
+        Dispatcher $dispatcher,
         TranslatorInterface $translator,
         UserConnectionRepositoryInterface $userConnectionRepository,
         UserContactRepositoryInterface $userContactRepository,
         UserRepositoryInterface $userRepository,
         ValidatorInterface $validator
     ) {
-        parent::__construct($apiResponseFactory, $translator, $validator);
+        parent::__construct($apiResponseFactory, $dispatcher, $translator, $validator);
 
         $this->userConnectionRepository = $userConnectionRepository;
         $this->userContactRepository = $userContactRepository;
@@ -68,10 +94,7 @@ final class UserConnectionController extends AbstractController
 
         // We'll have to validate that the requested connection is not yet existing.
         /** @var null|\App\Database\Models\UserConnections $userConnection */
-        $userConnection = $this->userConnectionRepository->findOneBy($request->only([
-            'inviter_id',
-            'invitee_id'
-        ]));
+        $userConnection = $this->userConnectionRepository->findOneBy($request->only(['inviter_id', 'invitee_id']));
 
         if ($userConnection !== null) {
             if ($userConnection->status === $request->input('status') || $userConnection->status === AbstractModel::ACCEPTED_STATUS) {
@@ -105,8 +128,9 @@ final class UserConnectionController extends AbstractController
 
         $this->userConnectionRepository->save($userConnection);
 
-        // @todo: Call an event here that will publish the creation of the user connection.
-        // with this, the corresponding user contact will be created
+        $this->eventParameters = [$invitee->getKey(), $inviter->getKey()];
+        $this->dispatchEvent($userConnection->getKey());
+
         return $this->apiResponseFactory->createSuccess($userConnection->toArray(), 201);
     }
 
@@ -178,6 +202,26 @@ final class UserConnectionController extends AbstractController
         $this->userConnectionRepository->save($userConnections);
 
         return $this->apiResponseFactory->createSuccess($userConnections->toArray());
+    }
+
+    /**
+     * Get the event class corresponding to this controller.
+     *
+     * @return string
+     */
+    protected function getEventClass(): string
+    {
+        return UserContactsEvent::class;
+    }
+
+    /**
+     * Return the parameters required by the event
+     *
+     * @return mixed[]
+     */
+    protected function getEventParameters(): array
+    {
+        return $this->eventParameters;
     }
 
     /**
