@@ -26,7 +26,7 @@ final class UserContactsEvent extends AbstractEvent
     }
 
     /**
-     * Return the parameters required by the event
+     * Return the parameters required by the event.
      *
      * @return mixed[]
      */
@@ -35,6 +35,11 @@ final class UserContactsEvent extends AbstractEvent
         return $this->parameters;
     }
 
+    /**
+     * Return the primary key required by the event.
+     *
+     * @return string
+     */
     public function getUserConnectionId(): string
     {
         return $this->userConnectionsId;
