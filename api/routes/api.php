@@ -41,6 +41,7 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
 
             // :UserContactController
             $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
+                $router->get('/', 'UserContactController@list');
                 $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
             });
         });

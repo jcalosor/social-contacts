@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Database\Models\UserConnections;
 use App\Database\Models\UserContact;
 use App\Database\Repositories\Interfaces\UserContactRepositoryInterface;
 use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
@@ -41,12 +42,35 @@ final class UserContactController extends AbstractController
      */
     public function getByConnectionId(string $userId, string $userConnectionId): ApiResponseInterface
     {
-        /** @var null|\App\Database\Models\UserContact $userContact */
-        if (null === $userContact = $this->userContactRepository->findOneBy(['user_connections_id' => $userConnectionId])) {
-            return $this->apiResponseFactory->createNotFound(UserContact::class, $userConnectionId);
+        /** @var null|\Illuminate\Database\Eloquent\Collection $userContact */
+        if (null === $userContact = $this->userContactRepository->findBy([
+                'user_connections_id' => $userConnectionId
+            ])) {
+            return $this->apiResponseFactory->createNotFound(UserConnections::class, $userConnectionId);
         }
 
         return $this->apiResponseFactory->createSuccess($userContact->toArray());
+    }
+
+    /**
+     * Return a list of contacts belonging to this user.
+     *
+     * @param string $userId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     *
+     * @throws \Exception
+     */
+    public function list(string $userId): ApiResponseInterface
+    {
+        /** @var null|\Illuminate\Database\Eloquent\Collection $contacts */
+        $contacts = $this->userContactRepository->getContactsByStatus($userId);
+
+        if ($contacts === null) {
+            return $this->apiResponseFactory->createNotFound(UserContact::class, \sprintf('user_id: %s', $userId));
+        }
+
+        return $this->apiResponseFactory->createSuccess($contacts->toArray());
     }
 
     /**

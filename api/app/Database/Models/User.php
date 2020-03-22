@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class User extends AbstractModel
 {
+    /** @var string */
+    public const TABLE_NAME = 'users';
+
     /** @var null|\Illuminate\Database\Eloquent\Collection */
     protected $contacts;
 

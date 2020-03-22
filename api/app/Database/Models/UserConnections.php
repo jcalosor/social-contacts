@@ -6,11 +6,24 @@ namespace App\Database\Models;
 
 final class UserConnections extends AbstractModel
 {
+    /** @var string */
+    public const TABLE_NAME = 'user_connections';
+
+    /**
+     * Statuses exclusively available only to the invitees.
+     *
+     * @var mixed[]
+     */
     public static $inviteeStatuses = [
         'accept' => self::ACCEPTED_STATUS,
         'decline' => self::DECLINED_STATUS
     ];
 
+    /**
+     * Statuses exclusively available only to the inviter.
+     *
+     * @var mixed[]
+     */
     public static $inviterStatuses = [
         'cancel' => self::CANCELED,
         'pending' => self::PENDING_STATUS

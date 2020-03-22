@@ -86,6 +86,23 @@ final class UserConnectionController extends AbstractDispatchController
      */
     public function create(ApiRequestInterface $request, string $userId): ApiResponseInterface
     {
+        if ($userId === $request->input('invitee_id')) {
+            return $this->apiResponseFactory->createValidationError([
+                'invitee_id' => \sprintf('Cannot add a user with the same id as the inviter: %s', $userId)
+            ]);
+        }
+
+        // We'll have to validate that the an existing request
+        // does not exists where the inviter is the invitee and etc...
+        // @todo: All this validation can be moved to a middleware,
+        // @todo: but for the sake of a simple demo this will do for now.
+        if ($this->userConnectionRepository->findOneBy([
+                'invitee_id' => $userId,
+                'inviter_id' => $request->input('invitee_id')
+            ]) !== null) {
+            return $this->apiResponseFactory->createValidationError(['user_connection' => 'Connection request already exists.']);
+        }
+
         $request->merge(['inviter_id' => $userId, 'status' => AbstractModel::PENDING_STATUS]);
 
         if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {

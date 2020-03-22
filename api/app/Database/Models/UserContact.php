@@ -6,6 +6,10 @@ namespace App\Database\Models;
 
 final class UserContact extends AbstractModel
 {
+
+    /** @var string */
+    public const TABLE_NAME = 'user_contacts';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +27,21 @@ final class UserContact extends AbstractModel
      * @var array
      */
     protected $guarded = ['id'];
+
+    protected $hidden = ['users_id'];
+
+    /**
+     * Get the user where this invitee belongs to.
+     *
+     * @return \App\Database\Models\User
+     */
+    public function getContact(): User
+    {
+        /** @var \App\Database\Models\User $user */
+        $user = $this->belongsTo(User::class, 'contacts_id', 'id', 'contact')->first();
+
+        return $user;
+    }
 
     /**
      * Associate the contact that belongs to the user.

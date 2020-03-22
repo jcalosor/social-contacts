@@ -6,6 +6,8 @@ namespace App\Database\Models;
 
 class Group extends AbstractModel
 {
+    /** @var string */
+    public const TABLE_NAME = 'groups';
 
     /**
      * The attributes that are mass assignable.
