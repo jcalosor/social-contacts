@@ -26,6 +26,7 @@ class CreateUserTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
+            $table->string('avatar');
             $table->string('first_name', 32);
             $table->string('last_name', 32);
             $table->string('password', 190);
@@ -34,7 +35,7 @@ class CreateUserTable extends Migration
             $table->string('zip', 6);
             $table->string('country', 32);
             $table->string('email', 32)->index('user_email');
-            $table->string('phone', 13);
+            $table->string('phone', 13)->unique();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

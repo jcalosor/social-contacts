@@ -6,8 +6,11 @@ namespace App\Database\Models;
 
 final class UserContact extends AbstractModel
 {
-
-    /** @var string */
+    /**
+     * The static table name value.
+     *
+     * @var string
+     */
     public const TABLE_NAME = 'user_contacts';
 
     /**

@@ -51,6 +51,8 @@ final class UserController extends AbstractController
      */
     public function create(ApiRequestInterface $request): ApiResponseInterface
     {
+        $request->merge(['avatar' => User::AVATAR]);
+
         if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {
             return $errorResponse;
         }
@@ -120,6 +122,7 @@ final class UserController extends AbstractController
     protected function getValidationRules(): array
     {
         return [
+            'avatar' => 'string|required',
             'first_name' => 'string|required',
             'last_name' => 'string|required',
             'password' => 'string|required|min:6',

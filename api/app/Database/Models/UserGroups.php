@@ -5,7 +5,11 @@ namespace App\Database\Models;
 
 final class UserGroups extends AbstractModel
 {
-    /** @var string */
+    /**
+     * The static table name value.
+     *
+     * @var string
+     */
     public const TABLE_NAME = 'user_groups';
 
     /**

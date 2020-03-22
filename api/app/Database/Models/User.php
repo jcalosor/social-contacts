@@ -8,11 +8,19 @@ use Illuminate\Database\Eloquent\Collection;
 
 class User extends AbstractModel
 {
-    /** @var string */
-    public const TABLE_NAME = 'users';
+    /**
+     * Static string value to assign to the avatar field.
+     *
+     * @var string
+     */
+    public const AVATAR = 'https://cdn1.iconfinder.com/data/icons/instagram-ui-colored/48/JD-17-512.png';
 
-    /** @var null|\Illuminate\Database\Eloquent\Collection */
-    protected $contacts;
+    /**
+     * The static table name value.
+     *
+     * @var string
+     */
+    public const TABLE_NAME = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +28,7 @@ class User extends AbstractModel
      * @var array
      */
     protected $fillable = [
+        'avatar',
         'first_name',
         'last_name',
         'password',
@@ -55,19 +64,5 @@ class User extends AbstractModel
     public function getContacts(): Collection
     {
         return $this->hasMany(UserContact::class, 'user_id', 'id')->get();
-    }
-
-    /**
-     * Batch set contacts.
-     *
-     * @param \App\Database\Models\UserContact[] $contacts
-     *
-     * @return $this
-     */
-    public function setContacts(array $contacts): self
-    {
-        $this->contacts = new Collection($contacts);
-
-        return $this;
     }
 }

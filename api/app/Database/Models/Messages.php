@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Database\Models;
 
-class Group extends AbstractModel
+final class Messages extends AbstractModel
 {
     /**
      * The static table name value.
      *
      * @var string
      */
-    public const TABLE_NAME = 'groups';
+    public const TABLE_NAME = 'messages';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['message_thread_id', 'message', 'receiver_id', 'sender_id', 'status'];
 
     /**
      * The attributes that aren't mass assignable.
