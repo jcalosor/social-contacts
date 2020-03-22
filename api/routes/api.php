@@ -38,6 +38,11 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
                 $router->delete('/{connectionId}', 'UserConnectionController@delete');
                 $router->put('/{connectionId}/{status}', 'UserConnectionController@update');
             });
+
+            // :UserContactController
+            $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
+                $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
+            });
         });
     });
 });

@@ -27,8 +27,8 @@ class CreateUserContactTable extends Migration
         Schema::create('user_contacts', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
             $table->uuid('contacts_id');
-            $table->uuid('users_id')->index('user_contacts_id');
-            $table->uuid('user_connections_id');
+            $table->uuid('users_id')->index('user_contacts_users_id');
+            $table->uuid('user_connections_id')->index('user_contacts_user_connections_id');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

@@ -22,6 +22,7 @@ abstract class AbstractRepository extends AbstractEloquentRepository implements 
             $query->where(Str::snake($column), '=', $value);
         }
 
+        //Log::debug($query->toSql());
         /** @var \Illuminate\Database\Eloquent\Collection $result */
         $result = $query->get();
 

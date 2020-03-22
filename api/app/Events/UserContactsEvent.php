@@ -5,8 +5,18 @@ namespace App\Events;
 
 final class UserContactsEvent extends AbstractEvent
 {
+    /**
+     * Parameters resolved when event was invoked.
+     *
+     * @var mixed[]
+     */
     private array $parameters;
 
+    /**
+     * The primary key dependency.
+     *
+     * @var string
+     */
     private string $userConnectionsId;
 
     public function __construct(string $userConnectionsId, array $parameters)

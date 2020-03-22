@@ -25,32 +25,6 @@ final class UserContact extends AbstractModel
     protected $guarded = ['id'];
 
     /**
-     * Get the user where this invitee belongs to.
-     *
-     * @return \App\Database\Models\User
-     */
-    public function getInvitee(): User
-    {
-        /** @var \App\Database\Models\User $user */
-        $user = $this->belongsTo(User::class, 'invitee_id', 'id')->first();
-
-        return $user;
-    }
-
-    /**
-     * Get the user where this invitee belongs to.
-     *
-     * @return \App\Database\Models\User
-     */
-    public function getInviter(): User
-    {
-        /** @var \App\Database\Models\User $user */
-        $user = $this->belongsTo(User::class, 'inviter_id', 'id')->first();
-
-        return $user;
-    }
-
-    /**
      * Associate the contact that belongs to the user.
      *
      * @param \App\Database\Models\User $contact
