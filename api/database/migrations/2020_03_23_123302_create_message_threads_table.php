@@ -26,13 +26,13 @@ class CreateMessageThreadsTable extends Migration
     {
         Schema::create('message_threads', function (Blueprint $table) {
             $table->uuid('id')->unique()->primary();
-            $table->uuid('user_connection_id');
+            $table->uuid('user_connections_id');
             $table->string('title');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
 
-        Schema::create('message_threads', function (Blueprint $table) {
+        Schema::table('message_threads', function (Blueprint $table) {
             $table->foreign('user_connections_id')
                 ->references('id')
                 ->on('user_connections')

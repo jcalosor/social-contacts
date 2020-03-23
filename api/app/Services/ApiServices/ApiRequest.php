@@ -174,10 +174,16 @@ final class ApiRequest implements ApiRequestInterface
     /**
      * Retrieve the entire request as an array
      *
+     * @param null|array $excepts
+     *
      * @return mixed[]
      */
-    public function toArray(): array
+    public function toArray(?array $excepts = null): array
     {
+        if ($excepts !== null) {
+            return $this->request->except($excepts);
+        }
+
         return $this->request->all();
     }
 }

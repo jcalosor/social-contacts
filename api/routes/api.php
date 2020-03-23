@@ -43,6 +43,14 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
             $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
                 $router->get('/', 'UserContactController@list');
                 $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
+
+                // :MessageController - create a message
+                $router->post('/{contactId}', 'MessageController@create');
+            });
+
+            // :MessageController
+            $router->group(['prefix' => '{userId}/message'], function () use ($router): void {
+                $router->get('/', 'MessageController@list');
             });
         });
     });

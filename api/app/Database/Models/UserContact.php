@@ -31,6 +31,11 @@ final class UserContact extends AbstractModel
      */
     protected $guarded = ['id'];
 
+    /**
+     * The hidden fields.
+     *
+     * @var string[]
+     */
     protected $hidden = ['users_id'];
 
     /**
@@ -44,6 +49,21 @@ final class UserContact extends AbstractModel
         $user = $this->belongsTo(User::class, 'contacts_id', 'id', 'contact')->first();
 
         return $user;
+    }
+
+    /**
+     * Get the user connection this contact belongs to.
+     *
+     * @return \App\Database\Models\UserConnections
+     */
+    public function getUserConnections(): UserConnections
+    {
+        /** @var \App\Database\Models\UserConnections $userConnections */
+        $userConnections = $this
+            ->belongsTo(UserConnections::class, 'user_connections_id', 'id', 'user_connections')
+            ->first();
+
+        return $userConnections;
     }
 
     /**

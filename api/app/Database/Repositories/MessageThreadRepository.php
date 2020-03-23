@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace App\Database\Repositories;
 
 use App\Database\Models\MessageThreads;
-use App\Database\Repositories\Interfaces\MessageRepositoryInterface;
+use App\Database\Repositories\Interfaces\MessageThreadRepositoryInterface;
 
-final class MessageThreadRepository extends AbstractRepository implements MessageRepositoryInterface
+final class MessageThreadRepository extends AbstractRepository implements MessageThreadRepositoryInterface
 {
 
     /**

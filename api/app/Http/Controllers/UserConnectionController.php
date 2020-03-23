@@ -53,7 +53,7 @@ final class UserConnectionController extends AbstractDispatchController
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory
      * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @param \App\Services\ApiServices\Interfaces\TranslatorInterface $translator
-     * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userConnectionRepository
+     * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userContactRepository
      * @param \App\Database\Repositories\Interfaces\UserContactRepositoryInterface $userContactRepository
      * @param \App\Database\Repositories\Interfaces\UserRepositoryInterface $userRepository
      * @param \App\Services\Validator\Interfaces\ValidatorInterface $validator
@@ -62,14 +62,14 @@ final class UserConnectionController extends AbstractDispatchController
         ApiResponseFactoryInterface $apiResponseFactory,
         Dispatcher $dispatcher,
         TranslatorInterface $translator,
-        UserConnectionRepositoryInterface $userConnectionRepository,
+        UserConnectionRepositoryInterface $userContactRepository,
         UserContactRepositoryInterface $userContactRepository,
         UserRepositoryInterface $userRepository,
         ValidatorInterface $validator
     ) {
         parent::__construct($apiResponseFactory, $dispatcher, $translator, $validator);
 
-        $this->userConnectionRepository = $userConnectionRepository;
+        $this->userConnectionRepository = $userContactRepository;
         $this->userContactRepository = $userContactRepository;
         $this->userRepository = $userRepository;
     }
