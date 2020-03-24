@@ -5,9 +5,9 @@ namespace App\Listeners;
 
 use App\Database\Models\UserContact;
 use App\Database\Repositories\Interfaces\UserContactRepositoryInterface;
-use App\Events\UserContactsEvent;
+use App\Events\AbstractEvent;
 
-final class CreateUserContactsListener
+final class CreateUserContactsListener extends AbstractEventListener
 {
     /**
      * Resolved instance of the user contact repository.
@@ -27,24 +27,22 @@ final class CreateUserContactsListener
     }
 
     /**
-     * Handle the contacts event.
-     *
-     * @param \App\Events\UserContactsEvent $event
+     * @inheritDoc
      */
-    public function handle(UserContactsEvent $event): void
+    public function handle(AbstractEvent $event): void
     {
-        // We know that it will always be just two id values from the event,
+        // We know that it will always be just two id values from this event,
         // so we can just un-pack it here.
         [$firstId, $secondId] = $event->getParameters();
 
         $userContacts = [
             new UserContact([
-                'user_connections_id' => $event->getUserConnectionId(),
+                'user_connections_id' => $event->getPrimaryKey(),
                 'contacts_id' => $firstId,
                 'users_id' => $secondId
             ]),
             new UserContact([
-                'user_connections_id' => $event->getUserConnectionId(),
+                'user_connections_id' => $event->getPrimaryKey(),
                 'contacts_id' => $secondId,
                 'users_id' => $firstId
             ])

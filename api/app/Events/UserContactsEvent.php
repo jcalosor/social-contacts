@@ -19,6 +19,12 @@ final class UserContactsEvent extends AbstractEvent
      */
     private string $userConnectionsId;
 
+    /**
+     * UserContactsEvent constructor.
+     *
+     * @param string $userConnectionsId
+     * @param array $parameters
+     */
     public function __construct(string $userConnectionsId, array $parameters)
     {
         $this->userConnectionsId = $userConnectionsId;
@@ -26,9 +32,7 @@ final class UserContactsEvent extends AbstractEvent
     }
 
     /**
-     * Return the parameters required by the event.
-     *
-     * @return mixed[]
+     * @inheritDoc
      */
     public function getParameters(): array
     {
@@ -36,11 +40,9 @@ final class UserContactsEvent extends AbstractEvent
     }
 
     /**
-     * Return the primary key required by the event.
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function getUserConnectionId(): string
+    public function getPrimaryKey(): string
     {
         return $this->userConnectionsId;
     }

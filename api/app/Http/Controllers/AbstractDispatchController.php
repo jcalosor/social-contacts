@@ -18,6 +18,13 @@ abstract class AbstractDispatchController extends AbstractController
     protected Dispatcher $dispatcher;
 
     /**
+     * Parameters for event.
+     *
+     * @var mixed[]
+     */
+    protected array $eventParameters;
+
+    /**
      * AbstractDispatchController constructor.
      *
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory

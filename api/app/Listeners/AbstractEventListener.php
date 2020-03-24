@@ -5,7 +5,7 @@ namespace App\Listeners;
 
 use App\Events\AbstractEvent;
 
-abstract class AbstractListener
+abstract class AbstractEventListener
 {
     /**
      * Handle the abstract event.

@@ -5,3 +5,4 @@ api/Homestead.yaml
 api/.env
 api/.phpunit.result.cache
 api/.idea
+api/storage/logs/*

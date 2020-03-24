@@ -94,7 +94,7 @@ final class ApiResponseFactory implements ApiResponseFactoryInterface
         $code = 401;
 
         return $this->__create(
-            $this->composeContent('responses.unauthorized', null, $code, null),
+            $this->composeContent('responses.unauthorized', $content, $code, null),
             $code,
             $headers
         );

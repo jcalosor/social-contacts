@@ -18,7 +18,7 @@ final class MessageThreads extends AbstractModel
      *
      * @var array
      */
-    protected $fillable = ['title', 'user_connection_id'];
+    protected $fillable = ['title', 'user_connections_id'];
 
     /**
      * The attributes that aren't mass assignable.

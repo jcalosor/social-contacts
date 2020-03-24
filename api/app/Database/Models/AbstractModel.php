@@ -59,6 +59,13 @@ abstract class AbstractModel extends Model
     public const PENDING_STATUS = 'pending';
 
     /**
+     * The read status, indicates the message has already been opened.
+     *
+     * @const string
+     */
+    public const READ_STATUS = 'read';
+
+    /**
      * List of all the system wide statuses.
      *
      * @const string[]
@@ -71,6 +78,13 @@ abstract class AbstractModel extends Model
         self::DELETED_STATUS,
         self::PENDING_STATUS
     ];
+
+    /**
+     * The unread status, indicates the message is still new
+     *
+     * @const string
+     */
+    public const UNREAD_STATUS = 'unread';
 
     /**
      * The "booting" method of the model, generate and set the uuid.

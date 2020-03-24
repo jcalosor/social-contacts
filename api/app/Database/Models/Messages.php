@@ -12,7 +12,7 @@ final class Messages extends AbstractModel
      * @var string
      */
     public const TABLE_NAME = 'messages';
-
+    
     /**
      * The attributes that are mass assignable.
      *

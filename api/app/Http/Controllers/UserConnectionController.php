@@ -18,14 +18,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 final class UserConnectionController extends AbstractDispatchController
 {
-
-    /**
-     * Parameters for event.
-     *
-     * @var mixed[]
-     */
-    private array $eventParameters;
-
     /**
      * Instance of the user connection repository interface.
      *
@@ -53,7 +45,7 @@ final class UserConnectionController extends AbstractDispatchController
      * @param \App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface $apiResponseFactory
      * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @param \App\Services\ApiServices\Interfaces\TranslatorInterface $translator
-     * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userContactRepository
+     * @param \App\Database\Repositories\Interfaces\UserConnectionRepositoryInterface $userConnectionRepository
      * @param \App\Database\Repositories\Interfaces\UserContactRepositoryInterface $userContactRepository
      * @param \App\Database\Repositories\Interfaces\UserRepositoryInterface $userRepository
      * @param \App\Services\Validator\Interfaces\ValidatorInterface $validator
@@ -62,14 +54,14 @@ final class UserConnectionController extends AbstractDispatchController
         ApiResponseFactoryInterface $apiResponseFactory,
         Dispatcher $dispatcher,
         TranslatorInterface $translator,
-        UserConnectionRepositoryInterface $userContactRepository,
+        UserConnectionRepositoryInterface $userConnectionRepository,
         UserContactRepositoryInterface $userContactRepository,
         UserRepositoryInterface $userRepository,
         ValidatorInterface $validator
     ) {
         parent::__construct($apiResponseFactory, $dispatcher, $translator, $validator);
 
-        $this->userConnectionRepository = $userContactRepository;
+        $this->userConnectionRepository = $userConnectionRepository;
         $this->userContactRepository = $userContactRepository;
         $this->userRepository = $userRepository;
     }

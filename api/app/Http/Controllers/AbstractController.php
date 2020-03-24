@@ -64,6 +64,8 @@ abstract class AbstractController extends BaseController
      * @param string $column
      * @param null|int $except
      * @param null|string $idColumn
+     * @param null|string $whereIdColumn
+     * @param null $whereIdValue
      *
      * @return string
      */
@@ -71,9 +73,23 @@ abstract class AbstractController extends BaseController
         string $tableName,
         string $column,
         ?int $except = null,
-        ?string $idColumn = null
+        ?string $idColumn = null,
+        ?string $whereIdColumn = null,
+        $whereIdValue = null
     ): string {
         $idColumn = $idColumn ?? 'id';
+
+        if ($whereIdColumn !== null && $whereIdValue !== null) {
+            return \sprintf(
+                'unique:%s,%s,%s,%s,%s,%s',
+                $tableName,
+                $column,
+                $except,
+                $idColumn,
+                $whereIdColumn,
+                $whereIdValue
+            );
+        }
 
         return \sprintf('unique:%s,%s,%s,%s', $tableName, $column, $except, $idColumn);
     }

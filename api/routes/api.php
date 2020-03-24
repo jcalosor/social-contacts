@@ -45,7 +45,7 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
                 $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
 
                 // :MessageController - create a message
-                $router->post('/{contactId}', 'MessageController@create');
+                $router->post('/{userConnectionId}/message', 'MessageController@create');
             });
 
             // :MessageController
