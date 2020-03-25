@@ -70,14 +70,7 @@ final class MessageController extends AbstractDispatchController
      */
     public function create(ApiRequestInterface $request, string $userId, string $userConnectionId): ApiResponseInterface
     {
-        if (null !== $message = $request->input('message', null)) {
-            $request->merge(['message_word_count' => (int)\str_word_count($message)]);
-        }
-        if (null !== $title = $request->input('title', null)) {
-            $request->merge(['title_word_count' => (int)\str_word_count($title)]);
-        }
-
-        $request->merge(['sender_id' => $userId, 'status' => Messages::UNREAD_STATUS]);
+        $request = $this->__mutateRequest($request, $userId);
 
         // Title validation rule added on the fly,
         // we don't want to have duplicate title's on the message thread with the same user connection id.
@@ -114,7 +107,7 @@ final class MessageController extends AbstractDispatchController
         }
 
         $messageThreads = new MessageThreads([
-            'title' => $title,
+            'title' => $request->input('title'),
             'user_connections_id' => $userConnectionId
         ]);
 
@@ -126,6 +119,76 @@ final class MessageController extends AbstractDispatchController
         $this->dispatchEvent($messageThreads->getKey());
 
         return $this->apiResponseFactory->createSuccess($messageThreads->toArray());
+    }
+
+    /**
+     * Create the message from an existing message thread.
+     *
+     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     * @param string $userId
+     * @param string $userConnectionId
+     * @param string $messageThreadId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     */
+    public function createMessage(
+        ApiRequestInterface $request,
+        string $userId,
+        string $userConnectionId,
+        string $messageThreadId
+    ): ApiResponseInterface {
+        $request->merge(['sender_id' => $userId]);
+
+        /** @var null|\App\Database\Models\MessageThreads $messageThread */
+        $messageThread = $this->messageThreadRepository->find($messageThreadId);
+
+        if ($messageThread === null) {
+            return $this->apiResponseFactory->createNotFound(MessageThreads::class, $messageThreadId);
+        }
+
+        // This will just update the timestamp,
+        // with that, we can track when was the thread last updated.
+        $this->messageThreadRepository->save($messageThread);
+
+        // Now we'll have to check
+
+        return $this->apiResponseFactory->createSuccess([], 201);
+    }
+
+    /**
+     * Delete the message thread using the userId, userConnectionId messageThreadId.
+     *
+     * @param string $userId
+     * @param string $userConnectionId
+     * @param string $messageThreadId
+     *
+     * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     *
+     * @throws \Exception
+     */
+    public function delete(string $userId, string $userConnectionId, string $messageThreadId): ApiResponseInterface
+    {
+        /** @var null|\App\Database\Models\MessageThreads $messageThread */
+        $messageThread = $this->messageThreadRepository->find($messageThreadId);
+
+        if ($messageThread === null) {
+            return $this->apiResponseFactory->createNotFound(MessageThreads::class, $messageThreadId);
+        }
+
+        if ($messageThread->getUserConnections()->getKey() !== $userConnectionId) {
+            return $this->apiResponseFactory->createUnauthorized(['user_connection_id' => $userConnectionId]);
+        }
+
+        if (
+            $messageThread->getUserConnections()->getInvitee()->getKey() !== $userId ||
+            $messageThread->getUserConnections()->getInviter()->getKey() !== $userId
+        ) {
+            return $this->apiResponseFactory->createUnauthorized(['user_id' => $userId]);
+        }
+
+        $this->messageThreadRepository->delete($messageThread);
+
+        return $this->apiResponseFactory->createEmpty();
     }
 
     /**
@@ -149,14 +212,38 @@ final class MessageController extends AbstractDispatchController
      */
     protected function getValidationRules(): array
     {
-        // This is for update method.
-        // 'message_thread_id' => 'string|required|exists:message_threads,id',
         return [
             'message' => 'string|required',
-            'message_word_count' => 'int|max:5',
+            'message_word_count' => 'numeric|max:800',
             'receiver_id' => 'string|required|exists:users,id',
             'sender_id' => 'string|required|exists:users,id',
-            'title_word_count' => 'int|max:1'
+            'title_word_count' => 'numeric|max:100'
         ];
+    }
+
+    /**
+     * Mutates the request object to include the corresponding word counts.
+     *
+     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
+     * @param string $userId
+     * @param null|string $status
+     *
+     * @return \App\Services\ApiServices\Interfaces\ApiRequestInterface
+     */
+    private function __mutateRequest(
+        ApiRequestInterface $request,
+        string $userId,
+        ?string $status = null
+    ): ApiRequestInterface {
+        if (null !== $message = $request->input('message', null)) {
+            $request->merge(['message_word_count' => (int)\str_word_count($message)]);
+        }
+        if (null !== $title = $request->input('title', null)) {
+            $request->merge(['title_word_count' => (int)\str_word_count($title)]);
+        }
+
+        $request->merge(['sender_id' => $userId, 'status' => $status ?? Messages::UNREAD_STATUS]);
+
+        return $request;
     }
 }

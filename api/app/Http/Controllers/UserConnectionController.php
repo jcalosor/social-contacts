@@ -75,6 +75,8 @@ final class UserConnectionController extends AbstractDispatchController
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      *
      * @throws \Exception
+     *
+     * @noinspection PhpUndefinedFieldInspection
      */
     public function create(ApiRequestInterface $request, string $userId): ApiResponseInterface
     {
@@ -150,7 +152,10 @@ final class UserConnectionController extends AbstractDispatchController
      * @param string $connectionId
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
+     *
      * @throws \Exception
+     *
+     * @noinspection PhpUndefinedFieldInspection
      */
     public function delete(string $userId, string $connectionId): ApiResponseInterface
     {

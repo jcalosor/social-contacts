@@ -26,4 +26,19 @@ final class MessageThreads extends AbstractModel
      * @var array
      */
     protected $guarded = ['id'];
+
+    /**
+     * Get the user connection this contact belongs to.
+     *
+     * @return \App\Database\Models\UserConnections
+     */
+    public function getUserConnections(): UserConnections
+    {
+        /** @var \App\Database\Models\UserConnections $userConnections */
+        $userConnections = $this
+            ->belongsTo(UserConnections::class, 'user_connections_id', 'id', 'user_connections')
+            ->first();
+
+        return $userConnections;
+    }
 }

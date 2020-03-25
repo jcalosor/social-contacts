@@ -46,6 +46,8 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
 
                 // :MessageController - create a message
                 $router->post('/{userConnectionId}/message', 'MessageController@create');
+                $router->post('/{userConnectionId}/message/{messageThreadId}', 'MessageController@createMessage');
+                $router->delete('/{userConnectionId}/message/{messageThreadId}', 'MessageController@delete');
             });
 
             // :MessageController
