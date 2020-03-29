@@ -80,6 +80,7 @@ $app->configure('unostent-repository');
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'user.verify_sender_credentials' => \App\Http\Middleware\VerifySenderCredentials::class,
     'user.verify_user_credentials' => \App\Http\Middleware\VerifyUserCredentials::class
 ]);
 

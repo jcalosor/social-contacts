@@ -6,3 +6,5 @@ api/.env
 api/.phpunit.result.cache
 api/.idea
 api/storage/logs/*
+frontend/node_modules
+frontend/.idea

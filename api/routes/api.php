@@ -57,8 +57,14 @@ $router->group(['prefix' => 'api'], function () use ($router): void {
                     $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
 
                     // :MessageController - create a message
-                    $router->post('/{userConnectionId}/message', 'MessageController@create');
-                    $router->post('/{userConnectionId}/message/{messageThreadId}', 'MessageController@createMessage');
+                    $router->group(['middleware' => 'user.verify_sender_credentials'], function () use ($router): void {
+                        $router->post('/{userConnectionId}/message', 'MessageController@create');
+                        $router->post(
+                            '/{userConnectionId}/message/{messageThreadId}',
+                            'MessageController@createMessage'
+                        );
+                    });
+
                     $router->delete('/{userConnectionId}/message/{messageThreadId}', 'MessageController@delete');
                 });
 
