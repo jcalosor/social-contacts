@@ -37,7 +37,8 @@ class User extends AbstractModel
         'zip',
         'country',
         'email',
-        'phone'
+        'phone',
+        'logged_in'
     ];
 
     /**
@@ -52,9 +53,7 @@ class User extends AbstractModel
      *
      * @var array
      */
-    protected $hidden = [
-        'password',
-    ];
+    protected $hidden = ['password', 'logged_in'];
 
     /**
      * Return a collection of contacts associated to the User.

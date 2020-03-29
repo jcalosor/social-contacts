@@ -99,14 +99,16 @@ abstract class AbstractController extends BaseController
      *
      * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
      * @param null|mixed[] $additionalRules
+     * @param null|mixed[] $replacementRules
      *
      * @return null|\App\Utils\ApiConstructs\ApiResponseInterface
      */
     protected function validateRequestAndRespond(
         ApiRequestInterface $request,
-        ?array $additionalRules = null
+        ?array $additionalRules = null,
+        ?array $replacementRules = null
     ): ?ApiResponseInterface {
-        if (true !== $validate = $this->__validateRequest($request->toArray(), $additionalRules)) {
+        if (true !== $validate = $this->__validateRequest($request->toArray(), $additionalRules, $replacementRules)) {
             return $this->apiResponseFactory->createValidationError($validate);
         }
 
@@ -118,12 +120,13 @@ abstract class AbstractController extends BaseController
      *
      * @param mixed[] $data
      * @param null|mixed[] $additionalRules
+     * @param null|mixed[] $replacementRules
      *
      * @return mixed
      */
-    private function __validateRequest(array $data, ?array $additionalRules = null)
+    private function __validateRequest(array $data, ?array $additionalRules = null, ?array $replacementRules = null)
     {
-        $rules = $this->getValidationRules();
+        $rules = $replacementRules ?? $this->getValidationRules();
         if ($additionalRules !== null) {
             $rules = \array_merge($this->getValidationRules(), $additionalRules);
         }

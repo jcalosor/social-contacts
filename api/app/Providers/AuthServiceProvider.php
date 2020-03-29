@@ -2,20 +2,26 @@
 
 namespace App\Providers;
 
-use App\User;
-use Illuminate\Support\Facades\Gate;
+use App\Database\Models\User;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    /** @var \Illuminate\Auth\AuthManager $authManager */
+    private AuthManager $authManager;
+
     /**
-     * Register any application services.
+     * AuthServiceProvider constructor.
      *
-     * @return void
+     * @param $app
      */
-    public function register()
+    public function __construct($app)
     {
-        //
+        parent::__construct($app);
+
+        $this->authManager = $this->app['auth'];
     }
 
     /**
@@ -30,10 +36,19 @@ class AuthServiceProvider extends ServiceProvider
         // should return either a User instance or null. You're free to obtain
         // the User instance via an API token or any other method necessary.
 
-        $this->app['auth']->viaRequest('api', function ($request) {
-            if ($request->input('api_token')) {
-                return User::where('api_token', $request->input('api_token'))->first();
-            }
+        $this->authManager->viaRequest('api', function (Request $request) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            return User::where(['id' => $request->route('userId'), 'logged_in' => true])->first();
         });
+    }
+
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        // Register services
     }
 }

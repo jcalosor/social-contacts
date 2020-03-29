@@ -36,6 +36,7 @@ class CreateUserTable extends Migration
             $table->string('country', 32);
             $table->string('email', 32)->index('user_email');
             $table->string('phone', 13)->unique();
+            $table->boolean('logged_in')->default(false);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

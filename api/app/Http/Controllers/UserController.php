@@ -10,9 +10,8 @@ use App\Services\ApiServices\Interfaces\ApiResponseFactoryInterface;
 use App\Services\ApiServices\Interfaces\TranslatorInterface;
 use App\Services\Validator\Interfaces\ValidatorInterface;
 use App\Utils\ApiConstructs\ApiResponseInterface;
-use Illuminate\Support\Facades\Hash;
 
-final class UserController extends AbstractController
+final class UserController extends AbstractUserController
 {
     /**
      * Instance of User Repository Class.
@@ -38,33 +37,6 @@ final class UserController extends AbstractController
         parent::__construct($apiResponseFactory, $translator, $validator);
 
         $this->userRepository = $userRepository;
-    }
-
-    /**
-     * Create a user and return the created data.
-     *
-     * @param \App\Services\ApiServices\Interfaces\ApiRequestInterface $request
-     *
-     * @return \App\Utils\ApiConstructs\ApiResponseInterface
-     *
-     * @throws \Exception
-     */
-    public function create(ApiRequestInterface $request): ApiResponseInterface
-    {
-        $request->merge(['avatar' => User::AVATAR]);
-
-        if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {
-            return $errorResponse;
-        }
-        $password = ['password' => Hash::make($request->input('password'))];
-
-        $request->merge($password);
-
-        $user = new User($request->toArray());
-
-        $this->userRepository->save($user);
-
-        return $this->apiResponseFactory->createSuccess($user->toArray(), 201);
     }
 
     /**
@@ -114,24 +86,5 @@ final class UserController extends AbstractController
         $this->userRepository->save($user);
 
         return $this->apiResponseFactory->createSuccess($user->toArray());
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getValidationRules(): array
-    {
-        return [
-            'avatar' => 'string|required',
-            'first_name' => 'string|required',
-            'last_name' => 'string|required',
-            'password' => 'string|required|min:6',
-            'address' => 'string|required',
-            'city' => 'string|required',
-            'zip' => 'numeric|required|digits_between:4,6',
-            'country' => 'string|required',
-            'email' => 'string|required|unique:users,email',
-            'phone' => 'string|required'
-        ];
     }
 }

@@ -131,7 +131,7 @@ final class MessageController extends AbstractDispatchController
      *
      * @return \App\Utils\ApiConstructs\ApiResponseInterface
      */
-    public function createMessage(
+    public function update(
         ApiRequestInterface $request,
         string $userId,
         string $userConnectionId,

@@ -78,9 +78,10 @@ $app->configure('unostent-repository');
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+    'user.verify_user_credentials' => \App\Http\Middleware\VerifyUserCredentials::class
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -94,7 +95,7 @@ $app->configure('unostent-repository');
 */
 
 $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
 // Register in app providers
