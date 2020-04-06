@@ -15,65 +15,64 @@ declare(strict_types=1);
 /**
  * @var \Laravel\Lumen\Routing\Router $router
  */
-$router->group(['prefix' => 'api'], function () use ($router): void {
-    $router->group(['prefix' => 'v1'], function () use ($router): void {
-        // :AuthController
-        $router->group(['prefix' => 'auth'], function () use ($router): void {
-            $router->post('/sign-in', 'AuthController@signIn');
-            $router->post('/sign-up', 'AuthController@signUp');
+$router->group(['prefix' => 'api/v1'], function () use ($router): void {
+    // :AuthController
+    $router->group(['prefix' => 'auth'], function () use ($router): void {
+        $router->post('/sign-in', 'AuthController@signIn');
+        $router->post('/sign-up', 'AuthController@signUp');
 
-            $router->group(['middleware' => ['auth', 'user.verify_user_credentials']], function () use ($router): void {
-                $router->post('/sign-out/{userId}', 'AuthController@signOut');
-            });
+        $router->group(['middleware' => ['auth', 'user.verify_user_credentials']], function () use ($router): void {
+            $router->post('/sign-out/{userId}', 'AuthController@signOut');
+        });
+    });
+
+    // Routes that need's to be authenticated
+    $router->group(['middleware' => 'auth'], function () use ($router): void {
+        // :GroupController
+        $router->group(['prefix' => 'group'], function () use ($router): void {
+            $router->get('/', 'GroupController@list');
+            $router->post('/', 'GroupController@create');
+            $router->get('/{groupId}', 'GroupController@get');
+            $router->put('/{groupId}', 'GroupController@update');
         });
 
-        // Routes that need's to be authenticated
-        $router->group(['middleware' => 'auth'], function () use ($router): void {
-            // :GroupController
-            $router->group(['prefix' => 'group'], function () use ($router): void {
-                $router->get('/', 'GroupController@list');
-                $router->post('/', 'GroupController@create');
-                $router->get('/{groupId}', 'GroupController@get');
-                $router->put('/{groupId}', 'GroupController@update');
+        // :UserController
+        $router->group(['prefix' => 'user'], function () use ($router): void {
+            $router->get('/', 'UserController@list');
+            $router->post('/', 'UserController@create');
+            $router->get('/{userId}', 'UserController@get');
+            $router->put('/{userId}', 'UserController@update');
+
+            // :UserConnectionController
+            $router->group(['prefix' => '{userId}/connection'], function () use ($router): void {
+                $router->post('/', 'UserConnectionController@create');
+                $router->delete('/{connectionId}', 'UserConnectionController@delete');
+                $router->put('/{connectionId}/{status}', 'UserConnectionController@update');
             });
 
-            // :UserController
-            $router->group(['prefix' => 'user'], function () use ($router): void {
-                $router->get('/', 'UserController@list');
-                $router->post('/', 'UserController@create');
-                $router->get('/{userId}', 'UserController@get');
-                $router->put('/{userId}', 'UserController@update');
+            // :UserContactController
+            $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
+                $router->get('/', 'UserContactController@list');
+                $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
 
-                // :UserConnectionController
-                $router->group(['prefix' => '{userId}/connection'], function () use ($router): void {
-                    $router->post('/', 'UserConnectionController@create');
-                    $router->delete('/{connectionId}', 'UserConnectionController@delete');
-                    $router->put('/{connectionId}/{status}', 'UserConnectionController@update');
+                // :MessageController - create a message
+                $router->group(['middleware' => 'user.verify_sender_credentials'], function () use ($router): void {
+                    $router->post('/{userConnectionId}/message', 'MessageController@create');
+                    $router->post(
+                        '/{userConnectionId}/message/{messageThreadId}',
+                        'MessageController@createMessage'
+                    );
                 });
 
-                // :UserContactController
-                $router->group(['prefix' => '{userId}/contact'], function () use ($router): void {
-                    $router->get('/', 'UserContactController@list');
-                    $router->get('/{userConnectionId}', 'UserContactController@getByConnectionId');
+                $router->delete('/{userConnectionId}/message/{messageThreadId}', 'MessageController@delete');
+            });
 
-                    // :MessageController - create a message
-                    $router->group(['middleware' => 'user.verify_sender_credentials'], function () use ($router): void {
-                        $router->post('/{userConnectionId}/message', 'MessageController@create');
-                        $router->post(
-                            '/{userConnectionId}/message/{messageThreadId}',
-                            'MessageController@createMessage'
-                        );
-                    });
-
-                    $router->delete('/{userConnectionId}/message/{messageThreadId}', 'MessageController@delete');
-                });
-
-                // :MessageController
-                $router->group(['prefix' => '{userId}/message'], function () use ($router): void {
-                    $router->get('/', 'MessageController@list');
-                });
+            // :MessageController
+            $router->group(['prefix' => '{userId}/message'], function () use ($router): void {
+                $router->get('/', 'MessageController@list');
             });
         });
     });
 });
+
 
