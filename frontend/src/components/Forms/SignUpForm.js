@@ -46,20 +46,13 @@ class SignUpForm extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
         const validatedData = this.__validateForm(event);
-        const axiosConfig = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        };
 
         if (validatedData !== null) {
 
-            axios.post(this.props.endpoint + '/auth/sign-up', validatedData, axiosConfig)
+            axios.post(this.props.endpoint + '/auth/sign-up', validatedData, this.props.axiosConfig)
                 .then(response => {
-                    console.log(response);
                     if (response.status === 201) {
-                        localStorage.setItem('userId', response.data.data.id);
+                        localStorage.setItem('user', JSON.stringify(response.data.data));
                         localStorage.setItem('loggedIn', 'true');
                     }
                 })
@@ -70,6 +63,11 @@ class SignUpForm extends React.Component {
 
     }
 
+    /**
+     * Handle the change events for individual input fields.
+     *
+     * @param {object} event
+     */
     handleInputChange(event) {
         const target = event.target;
         const value = target.name === 'privacy_policy' ? target.checked : target.value;
@@ -83,6 +81,7 @@ class SignUpForm extends React.Component {
     }
 
 
+    // noinspection DuplicatedCode @todo: this should be moved to utils later
     /**
      *  Validate the form, return the validated data if valid, null if not.
      *

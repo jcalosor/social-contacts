@@ -39,21 +39,32 @@ import {
 
 
 class SignIn extends React.Component {
-    state = {};
+    constructor(props) {
+        super(props);
+        this.state = {
+            loaded: false
+        }
+    }
+
+    componentDidMount() {
+        document.documentElement.scrollTop = 0;
+        document.scrollingElement.scrollTop = 0;
+        this.setState({
+            loaded: true
+        });
+    }
 
     render() {
+
+        if (this.state.loaded === false) {
+            return null;
+        }
+
         return (
             <>
                 <main ref="main">
                     <section className="section section-lg section-shaped">
                         <div className="shape shape-style-1 shape-default">
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
                             <span/>
                         </div>
                         <Container className="py-md">

@@ -32,25 +32,32 @@ import SignUpForm from "../components/Forms/SignUpForm";
 
 class SignUp extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            loaded: false
+        }
+    }
+
     componentDidMount() {
         document.documentElement.scrollTop = 0;
         document.scrollingElement.scrollTop = 0;
-        this.refs.main.scrollTop = 0;
+        this.setState({
+            loaded: true
+        });
     }
 
     render() {
+
+        if (this.state.loaded === false) {
+            return null;
+        }
+
         return (
             <>
                 <main ref="main">
                     <section className="section section-shaped section-lg">
                         <div className="shape shape-style-1 bg-gradient-default">
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
-                            <span/>
                             <span/>
                         </div>
                         <Container className="pt-lg-12">
@@ -66,7 +73,7 @@ class SignUp extends React.Component {
                                             </div>
                                         </CardHeader>
                                         <CardBody className="px-lg-5 py-lg-5">
-                                            <SignUpForm endpoint={this.props.endpoint} />
+                                            <SignUpForm axiosConfig={this.props.axiosConfig} endpoint={this.props.endpoint}/>
                                         </CardBody>
                                     </Card>
                                 </Col>

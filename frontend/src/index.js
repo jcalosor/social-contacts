@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
+import {Route, BrowserRouter as Router, Switch, Redirect} from 'react-router-dom';
 
 import './assets/vendor/nucleo/css/nucleo.css';
 import './assets/vendor/font-awesome/css/font-awesome.min.css';
@@ -13,20 +13,51 @@ import SignUp from "./views/SignUp";
 import * as serviceWorker from './serviceWorker';
 import NavigationBar from "./components/Navbars/NavigationBar";
 import Footer from "./components/Footers/Footer";
+import Profile from "./views/Profile";
+import Forbidden from "./views/Forbidden";
 
 const endpoint = 'http://localhost:8080/api/v1';
 const loggedIn = 'true' === localStorage.getItem('loggedIn');
+const user = localStorage.getItem('user') ?? null;
+const axiosConfig = {
+    headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    }
+};
 
 const routes = (
     <Router>
         <NavigationBar loggedIn={loggedIn}/>
         <Switch>
-            <Route path="/" exact render={(props) => <SignIn {...props} endpoint={endpoint} loggedIn={loggedIn}/>}/>
+            <Route
+                path="/"
+                exact
+                render={(props) => (
+                    loggedIn === true ?
+                        <Redirect to={"/profile"}/> :
+                        <SignIn {...props} axiosConfig={axiosConfig} endpoint={endpoint} loggedIn={loggedIn}/>)
+                }
+            />
             <Route
                 path="/sign-up"
                 exact
-                render={(props) => <SignUp {...props} endpoint={endpoint} loggedIn={loggedIn}/>}
+                render={(props) => (
+                    loggedIn === true ?
+                        <Redirect to={"/profile"}/> :
+                        <SignUp {...props} axiosConfig={axiosConfig} endpoint={endpoint} loggedIn={loggedIn}/>)
+                }
             />
+            <Route
+                path="/profile"
+                exact
+                render={(props) => (
+                    loggedIn === true ?
+                        <Profile {...props} user={user} endpoint={endpoint} loggedIn={loggedIn}/> :
+                        <Redirect to={"/forbidden"}/>)
+                }
+            />
+            <Route path="/forbidden" component={Forbidden}/>
         </Switch>
         <Footer/>
     </Router>
