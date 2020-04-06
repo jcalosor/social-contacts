@@ -116,6 +116,10 @@ final class AuthController extends AbstractUserController
      */
     public function signUp(ApiRequestInterface $request): ApiResponseInterface
     {
+        if ($request->input('avatar', null) === null) {
+            $request->merge(['avatar' => User::AVATAR]);
+        }
+
         if (null !== $error = $this->validateRequestAndRespond($request)) {
             return $error;
         }
@@ -123,8 +127,6 @@ final class AuthController extends AbstractUserController
         if ($this->userRepository->findOneBy(['email' => $request->input('email')]) !== null) {
             return $this->apiResponseFactory->createError(['email' => 'Already exists!']);
         }
-
-        $request->merge(['avatar' => User::AVATAR]);
 
         if (null !== $errorResponse = $this->validateRequestAndRespond($request)) {
             return $errorResponse;

@@ -50,7 +50,6 @@ class SignUpForm extends React.Component {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
-
             }
         };
 
@@ -59,7 +58,7 @@ class SignUpForm extends React.Component {
             axios.post(this.props.endpoint + '/auth/sign-up', validatedData, axiosConfig)
                 .then(response => {
                     console.log(response);
-                    if (response.status === 201 && response.data.message() === 'Success!') {
+                    if (response.status === 201) {
                         localStorage.setItem('userId', response.data.data.id);
                         localStorage.setItem('loggedIn', 'true');
                     }
